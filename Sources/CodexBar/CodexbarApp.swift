@@ -257,16 +257,32 @@ struct CodexBarApp: App {
 struct IconView: View {
     let snapshot: UsageSnapshot?
     let isStale: Bool
+    @State private var phase: CGFloat = 0
+    private let displayLink = DisplayLink()
 
     var body: some View {
-        if let snapshot {
-            Image(nsImage: IconRenderer.makeIcon(
-                primaryRemaining: snapshot.primary.remainingPercent,
-                weeklyRemaining: snapshot.secondary.remainingPercent,
-                stale: self.isStale))
-        } else {
-            Image(systemName: "chart.bar.fill")
+        Group {
+            if let snapshot {
+                Image(nsImage: IconRenderer.makeIcon(
+                    primaryRemaining: snapshot.primary.remainingPercent,
+                    weeklyRemaining: snapshot.secondary.remainingPercent,
+                    stale: self.isStale))
+            } else {
+                Image(nsImage: IconRenderer.makeIcon(
+                    primaryRemaining: self.loadingValue,
+                    weeklyRemaining: self.loadingValue * 0.6,
+                    stale: false))
+                    .onReceive(self.displayLink.publisher) { _ in
+                        self.phase += 0.08
+                    }
+            }
         }
+    }
+
+    private var loadingValue: Double {
+        // Simple oscillating fill 20–90%
+        let v = 0.55 + 0.35 * sin(Double(self.phase))
+        return max(0, min(v * 100, 100))
     }
 }
 

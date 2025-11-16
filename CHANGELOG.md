@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.2 — 2025-11-16
+- Animated loading icon (dual bars sweep until usage arrives); always uses rendered template icon.
+- Sparkle embedding/signing fixed with deep+timestamp; notarization pipeline solid.
+- Icon conversion scripted via ictool with docs.
+- Menu: settings submenu, no GitHub item; About link clickable.
+
 ## 0.1.1 — 2025-11-16
 - Launch-at-login toggle (SMAppService) and saved preference applied at startup.
 - Sparkle auto-update wiring (SUFeedURL to GitHub, SUPublicEDKey set); Settings submenu with auto-update toggle + Check for Updates.
