@@ -2,7 +2,7 @@
 
 Tiny macOS 15+ menu bar app that shows how much Codex usage you have left (5‑hour + weekly windows) and when each window resets. No Dock icon, minimal UI, dynamic bar icon in the menu bar.
 
-![Screenshot](docs/screenshot.png)
+![CodexBar Screenshot](docs/codexbar-screenshot.png)
 
 ## Features
 - Reads the newest `rollout-*.jsonl` in `~/.codex/sessions/...` and extracts the latest `token_count` event (`used_percent`, `window_minutes`, `resets_at`).
