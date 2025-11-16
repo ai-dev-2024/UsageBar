@@ -173,32 +173,33 @@ struct MenuContent: View {
                     .foregroundStyle(.secondary)
             }
 
-            Menu("Refresh every: \(self.settings.refreshFrequency.label)") {
-                ForEach(RefreshFrequency.allCases) { option in
-                    Button {
-                        self.settings.refreshFrequency = option
-                    } label: {
-                        if self.settings.refreshFrequency == option {
-                            Label(option.label, systemImage: "checkmark")
-                        } else {
-                            Text(option.label)
-                        }
-                    }
-                }
-            }
-            .buttonStyle(.plain)
             Button {
                 Task { await self.store.refresh() }
             } label: {
-                Label(self.store.isRefreshing ? "Refreshing…" : "Refresh now", systemImage: "arrow.clockwise")
+                Text(self.store.isRefreshing ? "Refreshing…" : "Refresh now")
             }
             .disabled(self.store.isRefreshing)
             .buttonStyle(.plain)
             Divider()
-            Toggle("Automatically check for updates", isOn: self.autoUpdateBinding)
-            Toggle("Launch at login", isOn: self.$settings.launchAtLogin)
-            Button("Check for Updates…") {
-                self.updater.checkForUpdates(nil)
+            Menu("Settings") {
+                Menu("Refresh every: \(self.settings.refreshFrequency.label)") {
+                    ForEach(RefreshFrequency.allCases) { option in
+                        Button {
+                            self.settings.refreshFrequency = option
+                        } label: {
+                            if self.settings.refreshFrequency == option {
+                                Label(option.label, systemImage: "checkmark")
+                            } else {
+                                Text(option.label)
+                            }
+                        }
+                    }
+                }
+                Toggle("Automatically check for updates", isOn: self.autoUpdateBinding)
+                Toggle("Launch at login", isOn: self.$settings.launchAtLogin)
+                Button("Check for Updates…") {
+                    self.updater.checkForUpdates(nil)
+                }
             }
             .buttonStyle(.plain)
             Button("About CodexBar") {
