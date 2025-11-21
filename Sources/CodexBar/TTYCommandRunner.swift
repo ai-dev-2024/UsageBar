@@ -222,21 +222,22 @@ struct TTYCommandRunner {
                 readChunk()
                 respondIfCursorQuerySeen()
                 if !skippedCodexUpdate, containsCodexUpdatePrompt() {
-                    // Navigate with arrows to option 3 (Skip until next version) in case numeric shortcuts are ignored.
-                    try? send("\u{1b}[B")
-                    usleep(80_000)
-                    try? send("\u{1b}[B")
-                    usleep(80_000)
+                    // Prompt shows options: 1) Update now, 2) Skip, 3) Skip until next version.
+                    // Users report one Down + Enter is enough; follow with an extra Enter for safety, then re-run /status.
+                    try? send("\u{1b}[B") // highlight option 2 (Skip)
+                    usleep(120_000)
                     try? send("\r")
                     usleep(150_000)
-                    try? send("\r") // extra enter to exit dialog if needed
+                    try? send("\r") // if still focused on prompt, confirm again
+                    try? send("/status")
+                    try? send("\r")
                     updateSkipAttempts += 1
                     if updateSkipAttempts >= 1 {
                         skippedCodexUpdate = true
                         sentScript = false // re-send /status after dismissing
                         buffer.removeAll()
                     }
-                    usleep(250_000)
+                    usleep(300_000)
                 }
                 if !sentScript, (!containsCodexUpdatePrompt() || skippedCodexUpdate) {
                     try? send(script)
