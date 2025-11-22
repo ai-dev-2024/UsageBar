@@ -63,6 +63,13 @@ struct DebugPane: View {
                             Label("Save to file", systemImage: "externaldrive.badge.plus")
                         }
                         .disabled(self.isLoadingLog && self.logText.isEmpty)
+
+                        if self.currentLogProvider == .claude {
+                            Button { self.loadClaudeDump() } label: {
+                                Label("Load parse dump", systemImage: "doc.text.magnifyingglass")
+                            }
+                            .disabled(self.isLoadingLog)
+                        }
                     }
 
                     Button {
@@ -152,5 +159,16 @@ struct DebugPane: View {
         let pb = NSPasteboard.general
         pb.clearContents()
         pb.setString(text, forType: .string)
+    }
+
+    private func loadClaudeDump() {
+        self.isLoadingLog = true
+        Task {
+            let text = await self.store.debugClaudeDump()
+            await MainActor.run {
+                self.logText = text
+                self.isLoadingLog = false
+            }
+        }
     }
 }

@@ -337,6 +337,14 @@ final class UsageStore: ObservableObject {
         }
     }
 
+    func debugClaudeDump() async -> String {
+        let url = URL(fileURLWithPath: "/tmp/codexbar-claude-dump.txt")
+        if let data = try? Data(contentsOf: url), let text = String(data: data, encoding: .utf8) {
+            return text
+        }
+        return "No Claude parse dump found at \(url.path). Set DEBUG_CLAUDE_DUMP=1 and reproduce the parse failure."
+    }
+
     private func detectVersions() {
         Task.detached { [claudeFetcher] in
             let codexVer = Self.readCLI("codex", args: ["-s", "read-only", "-a", "untrusted", "--version"])
