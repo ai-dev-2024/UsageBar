@@ -1,7 +1,7 @@
 # Changelog
 
-## Unreleased
-- Pending changes.
+## 0.5.4 — Unreleased
+- Status blurb under “Status Page” no longer prefixes the text with “Status:”, keeping the incident description concise.
 
 ## 0.5.3 — 2025-11-22
 - Added a per-provider “Status Page” menu item beneath Usage that opens the provider’s live status page (OpenAI or Claude).

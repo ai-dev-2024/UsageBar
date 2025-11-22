@@ -207,9 +207,9 @@ struct MenuDescriptor {
         let label = description?.isEmpty == false ? description! : status.indicator.label
         if let updated = status.updatedAt {
             let freshness = UsageFormatter.updatedString(from: updated)
-            return "Status: \(label) — \(freshness)"
+            return "\(label) — \(freshness)"
         }
-        return "Status: \(label)"
+        return label
     }
 
     private static func appendRateWindow(entries: inout [Entry], title: String, window: RateWindow) {
