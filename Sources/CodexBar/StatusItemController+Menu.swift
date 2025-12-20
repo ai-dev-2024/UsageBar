@@ -495,15 +495,6 @@ private final class ProviderSwitcherView: NSView {
         self.onSelect = onSelect
         super.init(frame: NSRect(x: 0, y: 0, width: width, height: 30))
 
-        let stack = NSStackView()
-        stack.orientation = .horizontal
-        stack.spacing = 0
-        stack.alignment = .centerY
-        stack.distribution = .fill
-        if #available(macOS 11, *) {
-            stack.edgeInsets = NSEdgeInsets(top: 2, left: 6, bottom: 2, right: 6)
-        }
-
         func makeButton(index: Int, segment: Segment) -> NSButton {
             let button = PaddedToggleButton(
                 title: segment.title,
@@ -522,49 +513,66 @@ private final class ProviderSwitcherView: NSView {
             button.wantsLayer = true
             button.layer?.cornerRadius = 6
             button.state = (selected == segment.provider) ? .on : .off
+            button.translatesAutoresizingMaskIntoConstraints = false
             self.buttons.append(button)
             return button
         }
 
-        func makeSpacer() -> NSView {
-            let spacer = NSView()
-            spacer.setContentHuggingPriority(.defaultLow, for: .horizontal)
-            spacer.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
-            return spacer
+        for (index, segment) in self.segments.enumerated() {
+            let button = makeButton(index: index, segment: segment)
+            self.addSubview(button)
         }
 
-        if self.segments.count == 2 {
-            stack.addArrangedSubview(makeButton(index: 0, segment: self.segments[0]))
-            stack.addArrangedSubview(makeSpacer())
-            stack.addArrangedSubview(makeButton(index: 1, segment: self.segments[1]))
-        } else if self.segments.count == 3 {
-            stack.addArrangedSubview(makeButton(index: 0, segment: self.segments[0]))
-            stack.addArrangedSubview(makeSpacer())
-            stack.addArrangedSubview(makeButton(index: 1, segment: self.segments[1]))
-            stack.addArrangedSubview(makeSpacer())
-            stack.addArrangedSubview(makeButton(index: 2, segment: self.segments[2]))
-        } else {
-            for (index, segment) in self.segments.enumerated() {
-                stack.addArrangedSubview(makeButton(index: index, segment: segment))
+        // Keep segment widths stable across selected/unselected to avoid shifting.
+        for button in self.buttons {
+            let width = ceil(Self.maxToggleWidth(for: button))
+            if width > 0 {
+                button.widthAnchor.constraint(equalToConstant: width).isActive = true
             }
         }
 
-        self.addSubview(stack)
-        stack.translatesAutoresizingMaskIntoConstraints = false
-        NSLayoutConstraint.activate([
-            stack.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: 8),
-            stack.centerYAnchor.constraint(equalTo: self.centerYAnchor),
-            stack.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -8),
-        ])
+        let outerPadding: CGFloat = 14
+        let minimumGap: CGFloat = 8
 
-        // Keep segment widths stable across selected/unselected to avoid shifting the centered item.
-        let stableWidth = self.buttons
-            .map { Self.maxToggleWidth(for: $0) }
-            .max() ?? 0
-        if stableWidth > 0 {
-            for button in self.buttons {
-                button.widthAnchor.constraint(equalToConstant: ceil(stableWidth)).isActive = true
-            }
+        if self.buttons.count == 2 {
+            let left = self.buttons[0]
+            let right = self.buttons[1]
+            let gap = right.leadingAnchor.constraint(greaterThanOrEqualTo: left.trailingAnchor, constant: minimumGap)
+            gap.priority = .defaultHigh
+            NSLayoutConstraint.activate([
+                left.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: outerPadding),
+                left.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+                right.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -outerPadding),
+                right.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+                gap,
+            ])
+        } else if self.buttons.count == 3 {
+            let left = self.buttons[0]
+            let mid = self.buttons[1]
+            let right = self.buttons[2]
+
+            let leftGap = mid.leadingAnchor.constraint(greaterThanOrEqualTo: left.trailingAnchor, constant: minimumGap)
+            leftGap.priority = .defaultHigh
+            let rightGap = right.leadingAnchor.constraint(
+                greaterThanOrEqualTo: mid.trailingAnchor,
+                constant: minimumGap)
+            rightGap.priority = .defaultHigh
+
+            NSLayoutConstraint.activate([
+                left.leadingAnchor.constraint(equalTo: self.leadingAnchor, constant: outerPadding),
+                left.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+                mid.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+                mid.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+                right.trailingAnchor.constraint(equalTo: self.trailingAnchor, constant: -outerPadding),
+                right.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+                leftGap,
+                rightGap,
+            ])
+        } else if let first = self.buttons.first {
+            NSLayoutConstraint.activate([
+                first.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+                first.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            ])
         }
 
         self.updateButtonStyles()
