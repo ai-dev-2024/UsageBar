@@ -63,6 +63,11 @@ final class SettingsStore: ObservableObject {
         didSet { self.objectWillChange.send() }
     }
 
+    /// Optional: show Codex token + cost usage from @ccusage/codex (offline CLI).
+    @AppStorage("tokenCostUsageEnabled") var tokenCostUsageEnabled: Bool = false {
+        didSet { self.objectWillChange.send() }
+    }
+
     @AppStorage("randomBlinkEnabled") var randomBlinkEnabled: Bool = false {
         didSet { self.objectWillChange.send() }
     }
@@ -105,6 +110,9 @@ final class SettingsStore: ObservableObject {
         self.userDefaults = userDefaults
         if userDefaults.object(forKey: "sessionQuotaNotificationsEnabled") == nil {
             userDefaults.set(true, forKey: "sessionQuotaNotificationsEnabled")
+        }
+        if userDefaults.object(forKey: "tokenCostUsageEnabled") == nil {
+            userDefaults.set(TTYCommandRunner.which("ccusage-codex") != nil, forKey: "tokenCostUsageEnabled")
         }
         let raw = userDefaults.string(forKey: "refreshFrequency") ?? RefreshFrequency.fiveMinutes.rawValue
         self.refreshFrequency = RefreshFrequency(rawValue: raw) ?? .fiveMinutes

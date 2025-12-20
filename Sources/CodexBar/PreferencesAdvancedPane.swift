@@ -53,6 +53,19 @@ struct AdvancedPane: View {
                 Divider()
 
                 SettingsSection(contentSpacing: 12) {
+                    Text("Usage")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                        .textCase(.uppercase)
+                    PreferenceToggleRow(
+                        title: "Show token cost usage",
+                        subtitle: "If @ccusage/codex is installed, show session + monthly cost in the menu.",
+                        binding: self.$settings.tokenCostUsageEnabled)
+                }
+
+                Divider()
+
+                SettingsSection(contentSpacing: 12) {
                     Text("Status")
                         .font(.caption)
                         .foregroundStyle(.secondary)

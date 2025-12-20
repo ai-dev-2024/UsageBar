@@ -78,7 +78,7 @@ public enum UsageFormatter {
         let units: [(threshold: Int, divisor: Double, suffix: String)] = [
             (1_000_000_000, 1_000_000_000, "B"),
             (1_000_000, 1_000_000, "M"),
-            (1_000, 1_000, "K"),
+            (1000, 1000, "K"),
         ]
 
         for unit in units where absValue >= unit.threshold {

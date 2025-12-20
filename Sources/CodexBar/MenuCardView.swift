@@ -146,7 +146,7 @@ struct UsageMenuCardView: View {
                     }
                     if let tokenUsage = self.model.tokenUsage {
                         VStack(alignment: .leading, spacing: 2) {
-                            Text("Token usage")
+                            Text("Cost")
                                 .font(.subheadline)
                                 .fontWeight(.medium)
                             Text(tokenUsage.sessionLine)
@@ -209,6 +209,7 @@ extension UsageMenuCardView.Model {
         let isRefreshing: Bool
         let lastError: String?
         let usageBarsShowUsed: Bool
+        let tokenCostUsageEnabled: Bool
     }
 
     static func make(_ input: Input) -> UsageMenuCardView.Model {
@@ -225,7 +226,11 @@ extension UsageMenuCardView.Model {
             usageBarsShowUsed: input.usageBarsShowUsed)
         let creditsText = Self.creditsLine(metadata: input.metadata, credits: input.credits, error: input.creditsError)
         let creditsHintText = Self.dashboardHint(provider: input.provider, error: input.dashboardError)
-        let tokenUsage = Self.tokenUsageSection(provider: input.provider, snapshot: input.tokenSnapshot, error: input.tokenError)
+        let tokenUsage = Self.tokenUsageSection(
+            provider: input.provider,
+            enabled: input.tokenCostUsageEnabled,
+            snapshot: input.tokenSnapshot,
+            error: input.tokenError)
         let subtitle = Self.subtitle(
             snapshot: input.snapshot,
             isRefreshing: input.isRefreshing,
@@ -365,10 +370,12 @@ extension UsageMenuCardView.Model {
 
     private static func tokenUsageSection(
         provider: UsageProvider,
+        enabled: Bool,
         snapshot: CCUsageTokenSnapshot?,
         error: String?) -> TokenUsageSection?
     {
         guard provider == .codex else { return nil }
+        guard enabled else { return nil }
 
         if let snapshot {
             let sessionCost = snapshot.sessionCostUSD.map { UsageFormatter.usdString($0) } ?? "—"
@@ -392,7 +399,7 @@ extension UsageMenuCardView.Model {
         return TokenUsageSection(
             sessionLine: "Session: —",
             monthLine: "This month: —",
-            hintLine: err == nil ? "Install @ccusage/codex to see token usage." : nil,
+            hintLine: err == nil ? "Install @ccusage/codex to show cost usage." : nil,
             errorLine: err)
     }
 

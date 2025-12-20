@@ -415,7 +415,8 @@ extension StatusItemController {
             account: self.account,
             isRefreshing: self.store.isRefreshing,
             lastError: self.store.error(for: target),
-            usageBarsShowUsed: self.settings.usageBarsShowUsed)
+            usageBarsShowUsed: self.settings.usageBarsShowUsed,
+            tokenCostUsageEnabled: self.settings.tokenCostUsageEnabled)
         return UsageMenuCardView.Model.make(input)
     }
 }

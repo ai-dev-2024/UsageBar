@@ -68,8 +68,8 @@ struct ConsecutiveFailureGate {
 final class UsageStore: ObservableObject {
     @Published private var snapshots: [UsageProvider: UsageSnapshot] = [:]
     @Published private var errors: [UsageProvider: String] = [:]
-    @Published private var tokenSnapshots: [UsageProvider: CCUsageTokenSnapshot] = [:]
-    @Published private var tokenErrors: [UsageProvider: String] = [:]
+    @Published var tokenSnapshots: [UsageProvider: CCUsageTokenSnapshot] = [:]
+    @Published var tokenErrors: [UsageProvider: String] = [:]
     @Published var credits: CreditsSnapshot?
     @Published var lastCreditsError: String?
     @Published var openAIDashboard: OpenAIDashboardSnapshot?
@@ -97,22 +97,22 @@ final class UsageStore: ObservableObject {
 
     private let codexFetcher: UsageFetcher
     private let claudeFetcher: any ClaudeUsageFetching
-    private let ccusageFetcher: CCUsageFetcher
+    let ccusageFetcher: CCUsageFetcher
     private let registry: ProviderRegistry
-    private let settings: SettingsStore
+    let settings: SettingsStore
     private let sessionQuotaNotifier: SessionQuotaNotifier
     private let sessionQuotaLogger = Logger(subsystem: "com.steipete.codexbar", category: "sessionQuota")
     private let openAIWebLogger = Logger(subsystem: "com.steipete.codexbar", category: "openai-web")
     private var openAIWebDebugLines: [String] = []
     private var failureGates: [UsageProvider: ConsecutiveFailureGate] = [:]
-    private var tokenFailureGates: [UsageProvider: ConsecutiveFailureGate] = [:]
+    var tokenFailureGates: [UsageProvider: ConsecutiveFailureGate] = [:]
     private var providerSpecs: [UsageProvider: ProviderSpec] = [:]
     private let providerMetadata: [UsageProvider: ProviderMetadata]
     private var timerTask: Task<Void, Never>?
     private var cancellables = Set<AnyCancellable>()
     private var lastKnownSessionRemaining: [UsageProvider: Double] = [:]
-    private var lastTokenFetchAt: [UsageProvider: Date] = [:]
-    private let tokenFetchTTL: TimeInterval = 5 * 60
+    var lastTokenFetchAt: [UsageProvider: Date] = [:]
+    let tokenFetchTTL: TimeInterval = 5 * 60
 
     init(
         fetcher: UsageFetcher,
@@ -154,8 +154,6 @@ final class UsageStore: ObservableObject {
     var lastCodexError: String? { self.errors[.codex] }
     var lastClaudeError: String? { self.errors[.claude] }
     func error(for provider: UsageProvider) -> String? { self.errors[provider] }
-    func tokenSnapshot(for provider: UsageProvider) -> CCUsageTokenSnapshot? { self.tokenSnapshots[provider] }
-    func tokenError(for provider: UsageProvider) -> String? { self.tokenErrors[provider] }
     func metadata(for provider: UsageProvider) -> ProviderMetadata { self.providerMetadata[provider]! }
     func status(for provider: UsageProvider) -> ProviderStatus? {
         guard self.settings.statusChecksEnabled else { return nil }
@@ -357,53 +355,6 @@ final class UsageStore: ObservableObject {
                 } else {
                     self.errors[provider] = nil
                 }
-            }
-        }
-    }
-
-    private func refreshTokenUsage(_ provider: UsageProvider) async {
-        guard provider == .codex else {
-            self.tokenSnapshots.removeValue(forKey: provider)
-            self.tokenErrors[provider] = nil
-            self.tokenFailureGates[provider]?.reset()
-            self.lastTokenFetchAt.removeValue(forKey: provider)
-            return
-        }
-
-        guard self.isEnabled(provider) else {
-            self.tokenSnapshots.removeValue(forKey: provider)
-            self.tokenErrors[provider] = nil
-            self.tokenFailureGates[provider]?.reset()
-            self.lastTokenFetchAt.removeValue(forKey: provider)
-            return
-        }
-
-        let now = Date()
-        if let last = self.lastTokenFetchAt[provider],
-           now.timeIntervalSince(last) < self.tokenFetchTTL,
-           self.tokenSnapshots[provider] != nil
-        {
-            return
-        }
-        self.lastTokenFetchAt[provider] = now
-
-        do {
-            let task = Task(priority: .utility) {
-                try await self.ccusageFetcher.loadTokenSnapshot(cli: .codex, now: now)
-            }
-            let snapshot = try await task.value
-            self.tokenSnapshots[provider] = snapshot
-            self.tokenErrors[provider] = nil
-            self.tokenFailureGates[provider]?.recordSuccess()
-        } catch {
-            let hadPriorData = self.tokenSnapshots[provider] != nil
-            let shouldSurface = self.tokenFailureGates[provider]?
-                .shouldSurfaceError(onFailureWithPriorData: hadPriorData) ?? true
-            if shouldSurface {
-                self.tokenErrors[provider] = error.localizedDescription
-                self.tokenSnapshots.removeValue(forKey: provider)
-            } else {
-                self.tokenErrors[provider] = nil
             }
         }
     }

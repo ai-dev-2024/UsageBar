@@ -45,10 +45,13 @@ struct MenuCardModelTests {
             creditsError: nil,
             dashboard: nil,
             dashboardError: nil,
+            tokenSnapshot: nil,
+            tokenError: nil,
             account: AccountInfo(email: "codex@example.com", plan: "Plus Plan"),
             isRefreshing: false,
             lastError: nil,
-            usageBarsShowUsed: false))
+            usageBarsShowUsed: false,
+            tokenCostUsageEnabled: false))
 
         #expect(model.providerName == "Codex")
         #expect(model.metrics.count == 2)
@@ -94,10 +97,13 @@ struct MenuCardModelTests {
             creditsError: nil,
             dashboard: dashboard,
             dashboardError: nil,
+            tokenSnapshot: nil,
+            tokenError: nil,
             account: AccountInfo(email: "codex@example.com", plan: "Plus Plan"),
             isRefreshing: false,
             lastError: nil,
-            usageBarsShowUsed: true))
+            usageBarsShowUsed: true,
+            tokenCostUsageEnabled: false))
 
         #expect(model.metrics.first?.title == "Session")
         #expect(model.metrics.first?.percent == 22)
@@ -133,10 +139,13 @@ struct MenuCardModelTests {
             creditsError: nil,
             dashboard: dashboard,
             dashboardError: nil,
+            tokenSnapshot: nil,
+            tokenError: nil,
             account: AccountInfo(email: "codex@example.com", plan: nil),
             isRefreshing: false,
             lastError: nil,
-            usageBarsShowUsed: false))
+            usageBarsShowUsed: false,
+            tokenCostUsageEnabled: false))
 
         #expect(model.metrics.contains { $0.title == "Code review" && $0.percent == 73 })
     }
@@ -165,10 +174,13 @@ struct MenuCardModelTests {
             creditsError: nil,
             dashboard: nil,
             dashboardError: nil,
+            tokenSnapshot: nil,
+            tokenError: nil,
             account: AccountInfo(email: "codex@example.com", plan: "plus"),
             isRefreshing: false,
             lastError: nil,
-            usageBarsShowUsed: false))
+            usageBarsShowUsed: false,
+            tokenCostUsageEnabled: false))
 
         #expect(model.metrics.count == 1)
         #expect(model.metrics.first?.title == "Session")
@@ -186,10 +198,13 @@ struct MenuCardModelTests {
             creditsError: nil,
             dashboard: nil,
             dashboardError: nil,
+            tokenSnapshot: nil,
+            tokenError: nil,
             account: AccountInfo(email: nil, plan: nil),
             isRefreshing: false,
             lastError: "Probe failed for Codex",
-            usageBarsShowUsed: false))
+            usageBarsShowUsed: false,
+            tokenCostUsageEnabled: false))
 
         #expect(model.subtitleStyle == .error)
         #expect(model.subtitleText.contains("Probe failed"))
@@ -207,10 +222,13 @@ struct MenuCardModelTests {
             creditsError: nil,
             dashboard: nil,
             dashboardError: nil,
+            tokenSnapshot: nil,
+            tokenError: nil,
             account: AccountInfo(email: "codex@example.com", plan: "plus"),
             isRefreshing: false,
             lastError: nil,
-            usageBarsShowUsed: false))
+            usageBarsShowUsed: false,
+            tokenCostUsageEnabled: false))
 
         #expect(model.planText == nil)
         #expect(model.email.isEmpty)
