@@ -6,6 +6,7 @@ struct CodexBarWidgetBundle: WidgetBundle {
     var body: some Widget {
         CodexBarUsageWidget()
         CodexBarHistoryWidget()
+        CodexBarCompactWidget()
     }
 }
 
@@ -40,5 +41,22 @@ struct CodexBarHistoryWidget: Widget {
         .configurationDisplayName("CodexBar History")
         .description("Usage history chart with recent totals.")
         .supportedFamilies([.systemMedium, .systemLarge])
+    }
+}
+
+struct CodexBarCompactWidget: Widget {
+    private let kind = "CodexBarCompactWidget"
+
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(
+            kind: self.kind,
+            intent: CompactMetricSelectionIntent.self,
+            provider: CodexBarCompactTimelineProvider())
+        { entry in
+            CodexBarCompactWidgetView(entry: entry)
+        }
+        .configurationDisplayName("CodexBar Metric")
+        .description("Compact widget for credits or cost.")
+        .supportedFamilies([.systemSmall])
     }
 }

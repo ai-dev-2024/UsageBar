@@ -24,6 +24,20 @@ enum ProviderChoice: String, AppEnum {
     }
 }
 
+enum CompactMetric: String, AppEnum {
+    case credits
+    case todayCost
+    case last30DaysCost
+
+    static var typeDisplayRepresentation = TypeDisplayRepresentation(name: "Metric")
+
+    static var caseDisplayRepresentations: [CompactMetric: DisplayRepresentation] = [
+        .credits: DisplayRepresentation(title: "Credits left"),
+        .todayCost: DisplayRepresentation(title: "Today cost"),
+        .last30DaysCost: DisplayRepresentation(title: "30d cost"),
+    ]
+}
+
 struct ProviderSelectionIntent: AppIntent, WidgetConfigurationIntent {
     static var title: LocalizedStringResource = "Provider"
     static var description = IntentDescription("Select the provider to display in the widget.")
@@ -36,9 +50,32 @@ struct ProviderSelectionIntent: AppIntent, WidgetConfigurationIntent {
     }
 }
 
+struct CompactMetricSelectionIntent: AppIntent, WidgetConfigurationIntent {
+    static var title: LocalizedStringResource = "Provider + Metric"
+    static var description = IntentDescription("Select the provider and metric to display.")
+
+    @Parameter(title: "Provider")
+    var provider: ProviderChoice
+
+    @Parameter(title: "Metric")
+    var metric: CompactMetric
+
+    init() {
+        self.provider = .codex
+        self.metric = .credits
+    }
+}
+
 struct CodexBarWidgetEntry: TimelineEntry {
     let date: Date
     let provider: UsageProvider
+    let snapshot: WidgetSnapshot
+}
+
+struct CodexBarCompactEntry: TimelineEntry {
+    let date: Date
+    let provider: UsageProvider
+    let metric: CompactMetric
     let snapshot: WidgetSnapshot
 }
 
@@ -65,6 +102,40 @@ struct CodexBarTimelineProvider: AppIntentTimelineProvider {
         let provider = configuration.provider.provider
         let snapshot = WidgetSnapshotStore.load() ?? WidgetPreviewData.snapshot()
         let entry = CodexBarWidgetEntry(date: Date(), provider: provider, snapshot: snapshot)
+        let refresh = Date().addingTimeInterval(30 * 60)
+        return Timeline(entries: [entry], policy: .after(refresh))
+    }
+}
+
+struct CodexBarCompactTimelineProvider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> CodexBarCompactEntry {
+        CodexBarCompactEntry(
+            date: Date(),
+            provider: .codex,
+            metric: .credits,
+            snapshot: WidgetPreviewData.snapshot())
+    }
+
+    func snapshot(for configuration: CompactMetricSelectionIntent, in context: Context) async -> CodexBarCompactEntry {
+        let provider = configuration.provider.provider
+        return CodexBarCompactEntry(
+            date: Date(),
+            provider: provider,
+            metric: configuration.metric,
+            snapshot: WidgetSnapshotStore.load() ?? WidgetPreviewData.snapshot())
+    }
+
+    func timeline(
+        for configuration: CompactMetricSelectionIntent,
+        in context: Context) async -> Timeline<CodexBarCompactEntry>
+    {
+        let provider = configuration.provider.provider
+        let snapshot = WidgetSnapshotStore.load() ?? WidgetPreviewData.snapshot()
+        let entry = CodexBarCompactEntry(
+            date: Date(),
+            provider: provider,
+            metric: configuration.metric,
+            snapshot: snapshot)
         let refresh = Date().addingTimeInterval(30 * 60)
         return Timeline(entries: [entry], policy: .after(refresh))
     }
