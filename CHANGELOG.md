@@ -1,8 +1,14 @@
 # Changelog
 
-## 0.12.1 — Unreleased
+## 0.13.0 — Unreleased
+- Claude: add optional web-first usage via Safari/Chrome cookies (with CLI fallback) including “Extra usage” budget bar.
+- Settings: standardize “Augment … via web” copy for Codex + Claude web cookie features.
+- Debug: Claude dump now shows web/CLI strategy, cookie discovery, HTTP status codes, and parsed summary.
+- Tests: add unit coverage for Claude web API usage + overage parsing.
 - Menu: custom menu items now use the native selection highlight color (plus matching selection text/track colors).
 - Charts: boost hover highlight contrast for credits/usage history bands.
+- Menu: reorder Codex blocks to show credits before cost.
+- Menu: split Claude “Extra usage” (no submenu) from “Cost” (history submenu) and trim redundant extra-usage subtext.
 
 ## 0.12.0 — 2025-12-23
 - Widgets: add WidgetKit extension backed by a shared app‑group usage snapshot.
