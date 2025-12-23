@@ -63,6 +63,7 @@ final class OpenAICreditsPurchaseWindowController: NSWindowController, WKNavigat
       const findNextButton = () => {
         const buttons = Array.from(document.querySelectorAll(buttonSelector));
         return buttons.find(btn => {
+          if (btn.type && String(btn.type).toLowerCase() === 'submit') return true;
           const label = labelFor(btn).toLowerCase();
           return label === 'next' || label.startsWith('next ');
         }) || null;
@@ -77,15 +78,50 @@ final class OpenAICreditsPurchaseWindowController: NSWindowController, WKNavigat
         }
         return false;
       };
+      const forceClickElement = (el) => {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect ? el.getBoundingClientRect() : null;
+        if (rect) {
+          const x = rect.left + rect.width / 2;
+          const y = rect.top + rect.height / 2;
+          const target = document.elementFromPoint(x, y);
+          if (target) {
+            try {
+              target.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+              return true;
+            } catch {
+              return false;
+            }
+          }
+        }
+        return false;
+      };
+      const requestSubmit = (el) => {
+        if (!el || !el.closest) return false;
+        const form = el.closest('form');
+        if (!form) return false;
+        if (typeof form.requestSubmit === 'function') {
+          form.requestSubmit(el);
+          return true;
+        }
+        if (typeof form.submit === 'function') {
+          form.submit();
+          return true;
+        }
+        return false;
+      };
       const clickNextIfReady = () => {
         const nextButton = findNextButton();
         if (!nextButton) return false;
         if (isDisabled(nextButton)) return false;
         const rect = nextButton.getBoundingClientRect ? nextButton.getBoundingClientRect() : null;
         if (rect && (rect.width < 2 || rect.height < 2)) return false;
-        return clickButton(nextButton);
+        nextButton.focus?.();
+        if (requestSubmit(nextButton)) return true;
+        if (clickButton(nextButton)) return true;
+        return forceClickElement(nextButton);
       };
-      const startNextPolling = (initialDelay = 1200, interval = 500, maxAttempts = 60) => {
+      const startNextPolling = (initialDelay = 1500, interval = 500, maxAttempts = 90) => {
         if (window.__codexbarNextPolling) return;
         window.__codexbarNextPolling = true;
         setTimeout(() => {
@@ -97,6 +133,17 @@ final class OpenAICreditsPurchaseWindowController: NSWindowController, WKNavigat
             }
           }, interval);
         }, initialDelay);
+      };
+      const observeNextButton = () => {
+        if (window.__codexbarNextObserver || !window.MutationObserver) return;
+        const observer = new MutationObserver(() => {
+          if (clickNextIfReady()) {
+            observer.disconnect();
+            window.__codexbarNextObserver = null;
+          }
+        });
+        observer.observe(document.body, { subtree: true, childList: true, attributes: true });
+        window.__codexbarNextObserver = observer;
       };
       const findCreditsCardButton = () => {
         const nodes = Array.from(document.querySelectorAll('h1,h2,h3,div,span,p'));
@@ -127,9 +174,11 @@ final class OpenAICreditsPurchaseWindowController: NSWindowController, WKNavigat
       if (findAndClick()) {
         window.__codexbarAutoBuyCreditsStarted = true;
         startNextPolling();
+        observeNextButton();
         return 'clicked';
       }
       startNextPolling(1500);
+      observeNextButton();
       let attempts = 0;
       const maxAttempts = 14;
       const timer = setInterval(() => {
