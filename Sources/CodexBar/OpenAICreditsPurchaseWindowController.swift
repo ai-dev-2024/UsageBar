@@ -121,7 +121,7 @@ final class OpenAICreditsPurchaseWindowController: NSWindowController, WKNavigat
         if (clickButton(nextButton)) return true;
         return forceClickElement(nextButton);
       };
-      const startNextPolling = (initialDelay = 1500, interval = 500, maxAttempts = 90) => {
+      const startNextPolling = (initialDelay = 500, interval = 500, maxAttempts = 90) => {
         if (window.__codexbarNextPolling) return;
         window.__codexbarNextPolling = true;
         setTimeout(() => {
@@ -177,7 +177,7 @@ final class OpenAICreditsPurchaseWindowController: NSWindowController, WKNavigat
         observeNextButton();
         return 'clicked';
       }
-      startNextPolling(1500);
+      startNextPolling(500);
       observeNextButton();
       let attempts = 0;
       const maxAttempts = 14;
