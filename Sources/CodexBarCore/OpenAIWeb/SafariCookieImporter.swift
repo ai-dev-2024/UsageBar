@@ -248,7 +248,6 @@ enum SafariCookieImporter {
         }
     }
 }
-#endif
 
 // MARK: - DataReader
 
@@ -289,3 +288,5 @@ private final class DataReader {
         return Double(bitPattern: raw)
     }
 }
+
+#endif

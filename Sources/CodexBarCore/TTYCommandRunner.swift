@@ -288,7 +288,7 @@ public struct TTYCommandRunner {
             var appended = Data()
             while true {
                 var tmp = [UInt8](repeating: 0, count: 8192)
-                let n = Darwin.read(primaryFD, &tmp, tmp.count)
+                let n = read(primaryFD, &tmp, tmp.count)
                 if n > 0 {
                     let slice = tmp.prefix(n)
                     buffer.append(contentsOf: slice)

@@ -197,12 +197,47 @@ private final class CodexRPCClient: @unchecked Sendable {
     private let stdinPipe = Pipe()
     private let stdoutPipe = Pipe()
     private let stderrPipe = Pipe()
+    private let stdoutLineStream: AsyncStream<Data>
+    private let stdoutLineContinuation: AsyncStream<Data>.Continuation
     private var nextID = 1
+
+    private final class LineBuffer: @unchecked Sendable {
+        private let lock = NSLock()
+        private var buffer = Data()
+
+        func appendAndDrainLines(_ data: Data) -> [Data] {
+            self.lock.lock()
+            defer { self.lock.unlock() }
+
+            self.buffer.append(data)
+            var out: [Data] = []
+            while let newline = self.buffer.firstIndex(of: 0x0A) {
+                let lineData = Data(self.buffer[..<newline])
+                self.buffer.removeSubrange(...newline)
+                if !lineData.isEmpty {
+                    out.append(lineData)
+                }
+            }
+            return out
+        }
+    }
+
+    private static func debugWriteStderr(_ message: String) {
+        #if !os(Linux)
+        fputs(message, stderr)
+        #endif
+    }
 
     init(
         executable: String = "codex",
         arguments: [String] = ["-s", "read-only", "-a", "untrusted", "app-server"]) throws
     {
+        var stdoutContinuation: AsyncStream<Data>.Continuation!
+        self.stdoutLineStream = AsyncStream<Data> { continuation in
+            stdoutContinuation = continuation
+        }
+        self.stdoutLineContinuation = stdoutContinuation
+
         let resolvedExec = BinaryLocator.resolveCodexBinary()
             ?? TTYCommandRunner.which(executable)
 
@@ -228,6 +263,24 @@ private final class CodexRPCClient: @unchecked Sendable {
             throw RPCWireError.startFailed(error.localizedDescription)
         }
 
+        let stdoutHandle = self.stdoutPipe.fileHandleForReading
+        let stdoutLineContinuation = self.stdoutLineContinuation
+        let stdoutBuffer = LineBuffer()
+        stdoutHandle.readabilityHandler = { handle in
+            let data = handle.availableData
+            if data.isEmpty {
+                handle.readabilityHandler = nil
+                stdoutLineContinuation.finish()
+                return
+            }
+
+            let lines = stdoutBuffer.appendAndDrainLines(data)
+
+            for lineData in lines {
+                stdoutLineContinuation.yield(lineData)
+            }
+        }
+
         let stderrHandle = self.stderrPipe.fileHandleForReading
         stderrHandle.readabilityHandler = { handle in
             let data = handle.availableData
@@ -239,7 +292,7 @@ private final class CodexRPCClient: @unchecked Sendable {
             }
             guard let text = String(data: data, encoding: .utf8), !text.isEmpty else { return }
             for line in text.split(whereSeparator: \.isNewline) {
-                fputs("[codex stderr] \(line)\n", stderr)
+                Self.debugWriteStderr("[codex stderr] \(line)\n")
             }
         }
     }
@@ -278,7 +331,7 @@ private final class CodexRPCClient: @unchecked Sendable {
             let message = try await self.readNextMessage()
 
             if message["id"] == nil, let methodName = message["method"] as? String {
-                fputs("[codex notify] \(methodName)\n", stderr)
+                Self.debugWriteStderr("[codex notify] \(methodName)\n")
                 continue
             }
 
@@ -310,11 +363,9 @@ private final class CodexRPCClient: @unchecked Sendable {
     }
 
     private func readNextMessage() async throws -> [String: Any] {
-        for try await lineData in self.stdoutPipe.fileHandleForReading.bytes.lines {
+        for await lineData in self.stdoutLineStream {
             if lineData.isEmpty { continue }
-            let line = String(lineData)
-            guard let data = line.data(using: .utf8) else { continue }
-            if let json = try JSONSerialization.jsonObject(with: data) as? [String: Any] {
+            if let json = try? JSONSerialization.jsonObject(with: lineData) as? [String: Any] {
                 return json
             }
         }

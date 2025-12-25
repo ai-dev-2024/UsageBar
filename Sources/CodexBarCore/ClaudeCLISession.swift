@@ -276,7 +276,7 @@ actor ClaudeCLISession {
         var appended = Data()
         while true {
             var tmp = [UInt8](repeating: 0, count: 8192)
-            let n = Darwin.read(self.primaryFD, &tmp, tmp.count)
+            let n = read(self.primaryFD, &tmp, tmp.count)
             if n > 0 {
                 appended.append(contentsOf: tmp.prefix(n))
                 continue
