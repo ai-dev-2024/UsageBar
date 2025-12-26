@@ -2,14 +2,10 @@ import AppKit
 import CodexBarCore
 import SwiftUI
 
-private enum ProviderTableMetrics {
-    static let columnSpacing: CGFloat = 12
-    static let sourceWidth: CGFloat = 90
-    static let statusWidth: CGFloat = 120
-    static let enabledWidth: CGFloat = 70
-    static let rowHorizontalPadding: CGFloat = 12
-    static let rowVerticalPadding: CGFloat = 10
-    static let indent: CGFloat = 16
+private enum ProviderListMetrics {
+    static let rowSpacing: CGFloat = 12
+    static let rowInsetsProvider = EdgeInsets(top: 8, leading: 12, bottom: 8, trailing: 12)
+    static let rowInsetsDetail = EdgeInsets(top: 6, leading: 28, bottom: 6, trailing: 12)
 }
 
 @MainActor
@@ -24,31 +20,24 @@ struct ProvidersPane: View {
     private var providers: [UsageProvider] { UsageProvider.allCases }
 
     var body: some View {
-        ScrollView(.vertical, showsIndicators: true) {
-            VStack(alignment: .leading, spacing: 16) {
-                SettingsSection(contentSpacing: 12) {
-                    Text("Providers")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                        .textCase(.uppercase)
-                    ProviderTableHeaderView()
-                    ProviderTableView(
-                        providers: self.providers,
-                        store: self.store,
-                        isEnabled: { provider in self.binding(for: provider) },
-                        subtitle: { provider in self.providerSubtitle(provider) },
-                        sourceLabel: { provider in self.providerSourceLabel(provider) },
-                        statusLabel: { provider in self.providerStatusLabel(provider) },
-                        settingsToggles: { provider in self.extraSettingsToggles(for: provider) },
-                        errorDisplay: { provider in self.providerErrorDisplay(provider) },
-                        isErrorExpanded: { provider in self.expandedBinding(for: provider) },
-                        onCopyError: { text in self.copyToPasteboard(text) })
-                }
-            }
-            .frame(maxWidth: .infinity, alignment: .leading)
-            .padding(.horizontal, 20)
-            .padding(.vertical, 12)
+        VStack(alignment: .leading, spacing: 12) {
+            self.header
+
+            ProviderListView(
+                providers: self.providers,
+                store: self.store,
+                isEnabled: { provider in self.binding(for: provider) },
+                subtitle: { provider in self.providerSubtitle(provider) },
+                sourceLabel: { provider in self.providerSourceLabel(provider) },
+                statusLabel: { provider in self.providerStatusLabel(provider) },
+                settingsToggles: { provider in self.extraSettingsToggles(for: provider) },
+                errorDisplay: { provider in self.providerErrorDisplay(provider) },
+                isErrorExpanded: { provider in self.expandedBinding(for: provider) },
+                onCopyError: { text in self.copyToPasteboard(text) })
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
         .onReceive(NotificationCenter.default.publisher(for: NSApplication.didBecomeActiveNotification)) { _ in
             self.runSettingsDidBecomeActiveHooks()
         }
@@ -73,6 +62,16 @@ struct ProvidersPane: View {
                     Text(active.message)
                 }
             })
+    }
+
+    private var header: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("Providers")
+                .font(.headline)
+            Text("Enable or disable usage providers. Providers may offer additional settings when enabled.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+        }
     }
 
     private func binding(for provider: UsageProvider) -> Binding<Bool> {
@@ -234,27 +233,8 @@ struct ProvidersPane: View {
     }
 }
 
-private struct ProviderTableHeaderView: View {
-    var body: some View {
-        HStack(spacing: ProviderTableMetrics.columnSpacing) {
-            Text("Provider")
-                .frame(maxWidth: .infinity, alignment: .leading)
-            Text("Source")
-                .frame(width: ProviderTableMetrics.sourceWidth, alignment: .leading)
-            Text("Status")
-                .frame(width: ProviderTableMetrics.statusWidth, alignment: .leading)
-            Text("Enabled")
-                .frame(width: ProviderTableMetrics.enabledWidth, alignment: .trailing)
-        }
-        .font(.caption)
-        .foregroundStyle(.secondary)
-        .textCase(.uppercase)
-        .padding(.bottom, 2)
-    }
-}
-
 @MainActor
-private struct ProviderTableView: View {
+private struct ProviderListView: View {
     private enum Row: Identifiable {
         case provider(UsageProvider)
         case toggle(provider: UsageProvider, toggle: ProviderSettingsToggleDescriptor)
@@ -285,22 +265,20 @@ private struct ProviderTableView: View {
 
     var body: some View {
         let rows = self.rows()
-        VStack(alignment: .leading, spacing: 0) {
-            ForEach(Array(rows.enumerated()), id: \.element.id) { idx, row in
-                self.render(row: row)
-                    .padding(.horizontal, ProviderTableMetrics.rowHorizontalPadding)
-                    .padding(.vertical, ProviderTableMetrics.rowVerticalPadding)
-                if idx != rows.count - 1 {
-                    Divider()
-                        .opacity(0.35)
-                }
-            }
+        List(rows) { row in
+            self.render(row: row)
+                .listRowInsets(self.insets(for: row))
         }
-        .background(Color(nsColor: .controlBackgroundColor).opacity(0.25))
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color(nsColor: .separatorColor).opacity(0.35), lineWidth: 1))
+        .listStyle(.inset)
+    }
+
+    private func insets(for row: Row) -> EdgeInsets {
+        switch row {
+        case .provider:
+            ProviderListMetrics.rowInsetsProvider
+        case .toggle, .error:
+            ProviderListMetrics.rowInsetsDetail
+        }
     }
 
     private func rows() -> [Row] {
@@ -325,7 +303,7 @@ private struct ProviderTableView: View {
     private func render(row: Row) -> some View {
         switch row {
         case let .provider(provider):
-            ProviderTableProviderRowView(
+            ProviderListProviderRowView(
                 provider: provider,
                 store: self.store,
                 isEnabled: self.isEnabled(provider),
@@ -333,11 +311,11 @@ private struct ProviderTableView: View {
                 sourceLabel: self.sourceLabel(provider),
                 statusLabel: self.statusLabel(provider))
         case let .toggle(provider, toggle):
-            ProviderTableToggleRowView(
+            ProviderListToggleRowView(
                 provider: provider,
                 toggle: toggle)
         case let .error(provider, display):
-            ProviderTableErrorRowView(
+            ProviderListErrorRowView(
                 title: "Last \(self.store.metadata(for: provider).displayName) fetch failed:",
                 display: display,
                 isExpanded: self.isErrorExpanded(provider),
@@ -347,7 +325,7 @@ private struct ProviderTableView: View {
 }
 
 @MainActor
-private struct ProviderTableProviderRowView: View {
+private struct ProviderListProviderRowView: View {
     let provider: UsageProvider
     @Bindable var store: UsageStore
     @Binding var isEnabled: Bool
@@ -356,46 +334,42 @@ private struct ProviderTableProviderRowView: View {
     let statusLabel: String
 
     var body: some View {
-        HStack(alignment: .center, spacing: ProviderTableMetrics.columnSpacing) {
+        HStack(alignment: .top, spacing: ProviderListMetrics.rowSpacing) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(self.store.metadata(for: self.provider).displayName)
-                    .font(.body.weight(.medium))
+                    .font(.subheadline.bold())
                 Text(self.subtitle)
                     .font(.footnote)
                     .foregroundStyle(.tertiary)
                     .fixedSize(horizontal: false, vertical: true)
+                HStack(spacing: 8) {
+                    Text(self.sourceLabel)
+                    Text(self.statusLabel)
+                }
+                .font(.footnote)
+                .foregroundStyle(.secondary)
             }
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            Text(self.sourceLabel)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .frame(width: ProviderTableMetrics.sourceWidth, alignment: .leading)
-
-            Text(self.statusLabel)
-                .font(.footnote)
-                .foregroundStyle(.secondary)
-                .frame(width: ProviderTableMetrics.statusWidth, alignment: .leading)
 
             Toggle("", isOn: self.$isEnabled)
                 .labelsHidden()
                 .toggleStyle(.switch)
-                .frame(width: ProviderTableMetrics.enabledWidth, alignment: .trailing)
+                .padding(.top, 2)
         }
     }
 }
 
 @MainActor
-private struct ProviderTableToggleRowView: View {
+private struct ProviderListToggleRowView: View {
     let provider: UsageProvider
     let toggle: ProviderSettingsToggleDescriptor
 
     var body: some View {
-        HStack(alignment: .top, spacing: ProviderTableMetrics.columnSpacing) {
+        HStack(alignment: .top, spacing: ProviderListMetrics.rowSpacing) {
             VStack(alignment: .leading, spacing: 8) {
                 VStack(alignment: .leading, spacing: 4) {
                     Text(self.toggle.title)
-                        .font(.body.weight(.medium))
+                        .font(.subheadline.weight(.semibold))
                     Text(self.toggle.subtitle)
                         .font(.footnote)
                         .foregroundStyle(.tertiary)
@@ -427,19 +401,12 @@ private struct ProviderTableToggleRowView: View {
                     }
                 }
             }
-            .padding(.leading, ProviderTableMetrics.indent)
             .frame(maxWidth: .infinity, alignment: .leading)
-
-            Color.clear
-                .frame(width: ProviderTableMetrics.sourceWidth)
-
-            Color.clear
-                .frame(width: ProviderTableMetrics.statusWidth)
 
             Toggle("", isOn: self.toggle.binding)
                 .labelsHidden()
                 .toggleStyle(.switch)
-                .frame(width: ProviderTableMetrics.enabledWidth, alignment: .trailing)
+                .padding(.top, 2)
         }
         .onChange(of: self.toggle.binding.wrappedValue) { _, enabled in
             guard let onChange = self.toggle.onChange else { return }
@@ -473,29 +440,20 @@ private struct ProviderErrorDisplay: Sendable {
 }
 
 @MainActor
-private struct ProviderTableErrorRowView: View {
+private struct ProviderListErrorRowView: View {
     let title: String
     let display: ProviderErrorDisplay
     @Binding var isExpanded: Bool
     let onCopy: () -> Void
 
     var body: some View {
-        HStack(alignment: .top, spacing: ProviderTableMetrics.columnSpacing) {
+        HStack(alignment: .top, spacing: ProviderListMetrics.rowSpacing) {
             ProviderErrorView(
                 title: self.title,
                 display: self.display,
                 isExpanded: self.$isExpanded,
                 onCopy: self.onCopy)
                 .frame(maxWidth: .infinity, alignment: .leading)
-
-            Color.clear
-                .frame(width: ProviderTableMetrics.sourceWidth)
-
-            Color.clear
-                .frame(width: ProviderTableMetrics.statusWidth)
-
-            Color.clear
-                .frame(width: ProviderTableMetrics.enabledWidth)
         }
     }
 }
