@@ -13,6 +13,7 @@
 - Cursor: add new usage provider with browser cookie auth (cursor.com + cursor.sh), on-demand bar support, and dashboard access.
 - Cursor: keep stored sessions on transient failures; clear only on invalid auth.
 - z.ai: new provider support with Tokens + MCP usage bars and MCP details submenu; API token now lives in Preferences (stored in Keychain); usage bars respect the show-used toggle. Thanks @uwe-schwarz for the initial work!
+- Copilot: new GitHub Copilot provider with device flow login plus Premium + Chat usage bars (including CLI support). Thanks @roshan-c!
 - Preferences: fix Advanced Display checkboxes and move the Quit button to the bottom of General.
 - Preferences: hide “Augment Claude via web” unless Claude usage source is CLI; rename the cost toggle to “Show cost summary”.
 - Preferences: add an Advanced toggle to show/hide optional Codex Credits + Claude Extra usage sections (on by default).
