@@ -362,7 +362,9 @@ extension StatusItemController {
             view
         }
         let hosting = MenuCardItemHostingView(rootView: wrapped, highlightState: highlightState)
-        hosting.autoresizingMask = [.width]
+        hosting.frame = NSRect(origin: .zero, size: NSSize(width: width, height: 1))
+        hosting.needsLayout = true
+        hosting.layoutSubtreeIfNeeded()
         // Important: constrain width before asking SwiftUI for the fitting height, otherwise text wrapping
         // changes the required height and the menu item becomes visually "squeezed".
         let height = self.menuCardHeight(for: hosting, width: width)
@@ -579,6 +581,12 @@ extension StatusItemController {
     MenuCardMeasuring {
         private let highlightState: MenuCardHighlightState
         override var allowsVibrancy: Bool { true }
+
+        override var intrinsicContentSize: NSSize {
+            let size = super.intrinsicContentSize
+            guard self.frame.width > 0 else { return size }
+            return NSSize(width: self.frame.width, height: size.height)
+        }
 
         init(rootView: Content, highlightState: MenuCardHighlightState) {
             self.highlightState = highlightState
