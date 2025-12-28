@@ -139,7 +139,7 @@ npm run clean
 
 ## 🙏 Acknowledgments
 
-- **[CodexBar](https://github.com/mzbac/CodexBar)** by [@mzbac](https://github.com/mzbac) – The original macOS inspiration for this project. UsageBar is the Windows counterpart, bringing the same great experience to Windows users.
+- **[CodexBar](https://github.com/steipete/CodexBar)** by [@steipete](https://github.com/steipete) – The original macOS inspiration for this project. UsageBar is the Windows counterpart, bringing the same great experience to Windows users.
 - Thanks to all the AI coding tool providers for making development more productive!
 
 ---
