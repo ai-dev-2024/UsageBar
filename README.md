@@ -56,21 +56,17 @@
 
 ## 📥 Installation
 
-### Option 1: Download Installer (Recommended)
-1. Go to [Releases](https://github.com/ai-dev-2024/UsageBar/releases)
-2. Download `UsageBar-Setup.exe`
-3. Run the installer
-4. Launch UsageBar from Start Menu or Desktop
+### Windows (Portable) - Recommended
+1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
+2. Download `UsageBar-v1.0.1-Portable.zip`.
+3. Extract the ZIP file to a folder of your choice (e.g., `Documents\UsageBar`).
+4. Open the folder and double-click **`UsageBar.exe`** to run.
+5. *(Optional)* Right-click `UsageBar.exe` → "Send to" → "Desktop (create shortcut)" for easy access.
 
-### Option 2: Portable Version
-1. Download `UsageBar-Portable.zip` from [Releases](https://github.com/steipete/UsageBar/releases)
-2. Extract to any folder
-3. Run `UsageBar.exe`
-
-### Option 3: Build from Source
+### Build from Source
 ```bash
 # Clone the repository
-git clone https://github.com/steipete/UsageBar.git
+git clone https://github.com/ai-dev-2024/UsageBar.git
 cd UsageBar
 
 # Install dependencies
