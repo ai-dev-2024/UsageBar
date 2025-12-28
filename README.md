@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="assets/icon.png" alt="UsageBar Logo" width="100" height="100">
+  <img src="assets/banner.png" alt="UsageBar Banner" width="100%">
 </p>
-
-<h1 align="center">UsageBar</h1>
 
 <p align="center">
   <strong>Windows system tray app for AI coding tool usage stats</strong>
