@@ -58,7 +58,7 @@
 
 ### Windows (Portable) - Recommended
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
-2. Download `UsageBar-v1.0.1-Portable.zip`.
+2. Download `UsageBar-v1.0.2-Portable.zip`.
 3. Extract the ZIP file to a folder of your choice (e.g., `Documents\UsageBar`).
 4. Open the folder and double-click **`UsageBar.exe`** to run.
 5. *(Optional)* Right-click `UsageBar.exe` → "Send to" → "Desktop (create shortcut)" for easy access.
@@ -83,16 +83,17 @@ npm run package
 
 ## 🔌 Supported Providers
 
-| Provider | Status | Detection Method |
-|----------|--------|------------------|
-| **Antigravity (Windsurf)** | ✅ Working | Auto-detect via process |
-| **Cursor** | ✅ Working | Auto-detect via config |
-| **Claude Code** | 🔧 CLI Required | `claude login` |
-| **Codex (OpenAI)** | 🔧 CLI Required | `codex` CLI auth |
-| **GitHub Copilot** | 🔧 CLI Required | `gh auth login` |
-| **Gemini** | 🔑 API Key | Settings → API Key |
-| **Factory** | 🔧 Configure | Settings |
-| **z.ai** | 🔧 Configure | Settings |
+| Provider | Auth Method | Status | Notes |
+|----------|-------------|--------|-------|
+| **Cursor** | Browser login | ✅ Tested | Click "Sign in to Cursor" → auto-captures session |
+| **GitHub Copilot** | GitHub OAuth | ✅ Tested | Device flow authentication |
+| **Antigravity (Windsurf)** | Auto-detect | ✅ Tested | Detects running process |
+| **Claude** | Browser/CLI | ⚠️ Limited | Free tier has no usage API; paid plans work |
+| **Codex (OpenAI)** | CLI | ❓ Untested | `codex login` required |
+| **Factory (Droid)** | App login | ❓ Untested | Requires Factory app |
+| **z.ai** | API Token | ❓ Untested | Set `ZAI_API_TOKEN` env var |
+
+> **Note**: Providers marked ❓ Untested should work based on CodexBar's implementation, but have not been verified. Please report any issues!
 
 ---
 

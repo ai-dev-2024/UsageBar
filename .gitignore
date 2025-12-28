@@ -20,3 +20,8 @@ Thumbs.db
 # Logs
 *.log
 npm-debug.log*
+
+# Session/Token files (extra protection - these are stored in AppData, not here)
+*-session.json
+*-token.json
+*.cookies

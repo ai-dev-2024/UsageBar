@@ -355,6 +355,82 @@ function setupIPC(): void {
     ipcMain.on('open-url', (_, url) => {
         shell.openExternal(url);
     });
+
+    // Cursor login flow
+    ipcMain.handle('cursor-login', async () => {
+        const cursorProvider = providerManager.getCursorProvider();
+        const success = await cursorProvider.openLoginWindow();
+        if (success) {
+            await refreshUsage();
+        }
+        return success;
+    });
+
+    ipcMain.handle('cursor-logout', async () => {
+        const cursorProvider = providerManager.getCursorProvider();
+        cursorProvider.clearStoredSession();
+        await refreshUsage();
+        return true;
+    });
+
+    ipcMain.handle('cursor-has-session', () => {
+        const cursorProvider = providerManager.getCursorProvider();
+        return cursorProvider.hasStoredSession();
+    });
+
+    // Claude login flow
+    ipcMain.handle('claude-login', async () => {
+        const claudeProvider = providerManager.getClaudeProvider();
+        const success = await claudeProvider.openLoginWindow();
+        if (success) {
+            await refreshUsage();
+        }
+        return success;
+    });
+
+    ipcMain.handle('claude-logout', async () => {
+        const claudeProvider = providerManager.getClaudeProvider();
+        claudeProvider.clearStoredSession();
+        await refreshUsage();
+        return true;
+    });
+
+    // Copilot login flow
+    ipcMain.handle('copilot-login', async () => {
+        const copilotProvider = providerManager.getCopilotProvider();
+        const success = await copilotProvider.openLoginWindow();
+        if (success) {
+            await refreshUsage();
+        }
+        return success;
+    });
+
+    ipcMain.handle('copilot-logout', async () => {
+        const copilotProvider = providerManager.getCopilotProvider();
+        copilotProvider.clearStoredSession();
+        await refreshUsage();
+        return true;
+    });
+
+    // Generic provider login handler
+    ipcMain.handle('provider-login', async (_, providerId: string) => {
+        let success = false;
+        switch (providerId) {
+            case 'cursor':
+                success = await providerManager.getCursorProvider().openLoginWindow();
+                break;
+            case 'claude':
+                success = await providerManager.getClaudeProvider().openLoginWindow();
+                break;
+            case 'copilot':
+                success = await providerManager.getCopilotProvider().openLoginWindow();
+                break;
+        }
+        if (success) {
+            await refreshUsage();
+        }
+        return success;
+    });
 }
 
 // Handle app lifecycle

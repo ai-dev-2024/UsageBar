@@ -45,14 +45,24 @@ export class FactoryProvider implements Provider {
             const credentials = await this.readCredentials();
 
             if (!credentials?.accessToken && !credentials?.workosToken) {
-                throw new Error('Factory credentials not found. Login via Factory app.');
+                return {
+                    providerId: this.id,
+                    displayName: this.displayName,
+                    error: 'Login via Factory app to view usage',
+                    needsLogin: true,
+                    updatedAt: new Date().toISOString(),
+                };
             }
 
             return await this.fetchUsage(credentials);
         } catch (error) {
-            throw new Error(
-                error instanceof Error ? error.message : 'Failed to fetch Factory usage'
-            );
+            return {
+                providerId: this.id,
+                displayName: this.displayName,
+                error: error instanceof Error ? error.message : 'Failed to fetch Factory usage',
+                needsLogin: true,
+                updatedAt: new Date().toISOString(),
+            };
         }
     }
 

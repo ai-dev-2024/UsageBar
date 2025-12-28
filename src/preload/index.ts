@@ -19,4 +19,14 @@ contextBridge.exposeInMainWorld('usagebar', {
     openUrl: (url: string) => ipcRenderer.send('open-url', url),
     onEnabledProvidersUpdate: (callback: (providers: string[]) => void) => ipcRenderer.on('enabled-providers-update', (_, providers) => callback(providers)),
     setSelectedProvider: (providerId: string) => ipcRenderer.send('set-selected-provider', providerId),
+
+    // Provider login flows
+    cursorLogin: () => ipcRenderer.invoke('cursor-login'),
+    cursorLogout: () => ipcRenderer.invoke('cursor-logout'),
+    cursorHasSession: () => ipcRenderer.invoke('cursor-has-session'),
+    claudeLogin: () => ipcRenderer.invoke('claude-login'),
+    claudeLogout: () => ipcRenderer.invoke('claude-logout'),
+    copilotLogin: () => ipcRenderer.invoke('copilot-login'),
+    copilotLogout: () => ipcRenderer.invoke('copilot-logout'),
+    providerLogin: (providerId: string) => ipcRenderer.invoke('provider-login', providerId),
 });

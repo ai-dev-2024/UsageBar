@@ -50,9 +50,13 @@ export class CodexProvider implements Provider {
                 return await this.fetchWithPTY(version);
             }
         } catch (error) {
-            throw new Error(
-                error instanceof Error ? error.message : 'Failed to fetch Codex usage'
-            );
+            return {
+                providerId: this.id,
+                displayName: this.displayName,
+                error: 'Install Codex CLI and run "codex login"',
+                needsLogin: true,
+                updatedAt: new Date().toISOString(),
+            };
         }
     }
 
@@ -222,7 +226,8 @@ export class CodexProvider implements Provider {
                 providerId: this.id,
                 displayName: this.displayName,
                 version,
-                error: 'Could not fetch usage. Run "codex login" to authenticate.',
+                error: 'Run "codex login" to authenticate',
+                needsLogin: true,
                 updatedAt: new Date().toISOString(),
             };
         }

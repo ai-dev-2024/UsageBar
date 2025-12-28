@@ -29,6 +29,7 @@ export interface ProviderUsage {
     accountPlan?: string;
     version?: string;
     error?: string;
+    needsLogin?: boolean;  // For providers that require browser login
     updatedAt: string;
     // New fields for macOS parity
     credits?: {
@@ -133,5 +134,26 @@ export class ProviderManager {
 
     getProviderUsage(providerId: string): ProviderUsage | undefined {
         return this.latestUsage[providerId];
+    }
+
+    /**
+     * Get Cursor provider instance for login flow
+     */
+    getCursorProvider(): CursorProvider {
+        return this.providers.get('cursor') as CursorProvider;
+    }
+
+    /**
+     * Get Claude provider instance for login flow
+     */
+    getClaudeProvider(): ClaudeProvider {
+        return this.providers.get('claude') as ClaudeProvider;
+    }
+
+    /**
+     * Get Copilot provider instance for login flow
+     */
+    getCopilotProvider(): CopilotProvider {
+        return this.providers.get('copilot') as CopilotProvider;
     }
 }

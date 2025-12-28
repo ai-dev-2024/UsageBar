@@ -40,14 +40,24 @@ export class ZaiProvider implements Provider {
             const token = await this.getToken();
 
             if (!token) {
-                throw new Error('z.ai token not found. Set ZAI_API_TOKEN or configure in settings.');
+                return {
+                    providerId: this.id,
+                    displayName: this.displayName,
+                    error: 'Set ZAI_API_TOKEN or configure in settings',
+                    needsLogin: true,
+                    updatedAt: new Date().toISOString(),
+                };
             }
 
             return await this.fetchUsage(token);
         } catch (error) {
-            throw new Error(
-                error instanceof Error ? error.message : 'Failed to fetch z.ai usage'
-            );
+            return {
+                providerId: this.id,
+                displayName: this.displayName,
+                error: error instanceof Error ? error.message : 'Failed to fetch z.ai usage',
+                needsLogin: true,
+                updatedAt: new Date().toISOString(),
+            };
         }
     }
 

@@ -257,6 +257,38 @@
             display: flex;
             justify-content: center;
         }
+
+        /* Login Button - shadCN inspired dark style */
+        .login-btn {
+            width: 100%;
+            padding: 10px 16px;
+            background: #18181b;
+            color: #fafafa;
+            border: 1px solid #27272a;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .login-btn:hover {
+            background: #27272a;
+            border-color: #3f3f46;
+        }
+
+        .login-btn:active {
+            background: #3f3f46;
+        }
+
+        .login-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
@@ -296,6 +328,10 @@
                 <div class="usage-label">Credits</div>
                 <div class="usage-meta"><span id="credits-value">--</span></div>
             </div>
+            <!-- Login button for Cursor -->
+            <div class="usage-group" id="login-group" style="display:none;">
+                <button class="login-btn" id="act-login">🔐 Sign in to Cursor</button>
+            </div>
         </div>
 
         <div class="divider"></div>
@@ -319,7 +355,8 @@
             tabs: document.getElementById('provider-tabs'), name: document.getElementById('p-name'), status: document.getElementById('p-status'), email: document.getElementById('p-email'), plan: document.getElementById('p-plan'),
             sFill: document.getElementById('s-fill'), sText: document.getElementById('s-text'), sReset: document.getElementById('s-reset'),
             wGroup: document.getElementById('w-group'), wFill: document.getElementById('w-fill'), wText: document.getElementById('w-text'), wReset: document.getElementById('w-reset'),
-            creditsGroup: document.getElementById('credits-group'), creditsValue: document.getElementById('credits-value')
+            creditsGroup: document.getElementById('credits-group'), creditsValue: document.getElementById('credits-value'),
+            loginGroup: document.getElementById('login-group'), loginBtn: document.getElementById('act-login')
         };
 
         // PREMIUM SVG ICONS - Meticulously sourced paths
@@ -419,23 +456,44 @@
             // Setup instructions for each provider
             const setupInstructions = {
                 antigravity: 'Open VS Code/Windsurf with Antigravity extension',
-                cursor: 'Open Cursor IDE and sign in',
-                claude: 'Run "claude login" in terminal',
+                cursor: 'Click the button below to sign in',
+                claude: 'Click the button below to sign in',
                 codex: 'Run "codex" CLI and authenticate',
-                copilot: 'Run "gh auth login" in terminal',
+                copilot: 'Click the button below to sign in',
                 gemini: 'Add your Gemini API key in Settings',
                 factory: 'Configure Factory in Settings',
                 zai: 'Configure z.ai in Settings'
             };
 
-            // If there's an error or no data, show "Yet to be configured"
+            // Hide login button by default
+            els.loginGroup.style.display = 'none';
+
+            // If there's an error or no data
             if (data.error || (!data.primary && !data.secondary)) {
-                els.status.textContent = 'Yet to be configured';
-                els.status.style.color = '#f59e0b';
+                const loginProviders = ['cursor', 'claude', 'copilot'];
+
+                // Check if user needs to login
+                if (loginProviders.includes(activeProviderId) && data.needsLogin) {
+                    els.loginGroup.style.display = 'block';
+                    els.status.textContent = 'Sign in required';
+                    els.status.style.color = '#f59e0b';
+                    const providerNames = { cursor: 'Cursor', claude: 'Claude', copilot: 'Copilot' };
+                    els.loginBtn.textContent = `Sign in to ${providerNames[activeProviderId]}`;
+                    els.sText.textContent = setupInstructions[activeProviderId] || 'Configure in Settings';
+                } else if (data.error && !data.needsLogin) {
+                    // User is logged in but API doesn't return usage (e.g., Claude free tier)
+                    els.status.textContent = 'Logged in ✓';
+                    els.status.style.color = '#22c55e';
+                    els.sText.textContent = data.error;
+                } else {
+                    // Generic error
+                    els.status.textContent = 'Yet to be configured';
+                    els.status.style.color = '#f59e0b';
+                    els.sText.textContent = setupInstructions[activeProviderId] || 'Configure in Settings';
+                }
 
                 // Hide usage bars
                 els.sFill.style.width = '0%';
-                els.sText.textContent = setupInstructions[activeProviderId] || 'Configure in Settings';
                 els.sReset.textContent = '';
                 els.wGroup.style.display = 'none';
             } else {
@@ -489,6 +547,36 @@
         };
         document.getElementById('act-about').onclick = () => {
             alert('UsageBar v1.0.1\n\nMonitor your AI coding tool usage.\n\nCreated by the community.\nAcknowledgments: CodexBar (macOS)');
+        };
+
+        // Generic provider login button handler
+        els.loginBtn.onclick = async () => {
+            if (!activeProviderId) return;
+
+            const providerNames = {
+                cursor: 'Cursor',
+                claude: 'Claude',
+                copilot: 'Copilot'
+            };
+            const providerName = providerNames[activeProviderId] || activeProviderId;
+
+            els.loginBtn.disabled = true;
+            els.loginBtn.textContent = `Signing in...`;
+
+            try {
+                const success = await ipc.providerLogin(activeProviderId);
+                if (success) {
+                    els.status.textContent = 'Signed in successfully!';
+                    els.status.style.color = '#22c55e';
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                els.status.textContent = 'Sign in failed';
+                els.status.style.color = '#ef4444';
+            }
+
+            els.loginBtn.disabled = false;
+            els.loginBtn.textContent = `Sign in to ${providerName}`;
         };
 
         // Initialize - fetch enabled providers and usage, then render
