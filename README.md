@@ -1,132 +1,168 @@
-# CodexBar 🎚️ - May your tokens never run out.
+<p align="center">
+  <img src="assets/icon.png" alt="UsageBar Logo" width="100" height="100">
+</p>
 
-Tiny macOS 14+ menu bar app that keeps your Codex, Claude Code, Cursor, Gemini, Antigravity, Droid (Factory), Copilot, and z.ai limits visible (session + weekly where available) and shows when each window resets. One status item per provider; enable what you use from Settings. No Dock icon, minimal UI, dynamic bar icons in the menu bar.
+<h1 align="center">UsageBar</h1>
 
-## Install
+<p align="center">
+  <strong>Windows system tray app for AI coding tool usage stats</strong>
+</p>
 
-### Requirements
-- macOS 14+ (Sonoma).
-- Apple Silicon (arm64). Intel builds are not currently published.
+<p align="center">
+  <a href="#features">Features</a> •
+  <a href="#screenshots">Screenshots</a> •
+  <a href="#installation">Installation</a> •
+  <a href="#supported-providers">Providers</a> •
+  <a href="#acknowledgments">Acknowledgments</a>
+</p>
 
-### Option A: GitHub Releases (recommended, Sparkle updates)
-1) Download the latest zip from GitHub Releases.
-2) Unzip and move `CodexBar.app` to `/Applications`.
-3) Open it (first run: right-click → Open).
-4) Sparkle will keep you updated automatically (About → “Automatically check for updates”).
+---
 
-Download: <https://github.com/steipete/CodexBar/releases>
+## 🎯 What is UsageBar?
 
-### Option B: Homebrew (updates via brew, Sparkle disabled)
+**UsageBar** is a lightweight Windows system tray application that displays your AI coding tool usage statistics at a glance. Stay on top of your usage limits across multiple AI coding assistants without switching between browser tabs or apps.
+
+> 💡 **Inspired by [CodexBar](https://github.com/mzbac/CodexBar)** – the macOS menu bar app for Codex CLI usage stats. UsageBar brings the same convenience to **Windows** users with expanded provider support.
+
+---
+
+## ✨ Features
+
+- 🖥️ **System Tray Integration** – Lives in your taskbar, always accessible
+- 📊 **Real-time Usage Meters** – Session and weekly usage at a glance
+- 🔄 **Auto-Refresh** – Configurable refresh intervals (1-30 minutes)
+- 🎨 **Beautiful UI** – Modern, macOS-inspired glassmorphic design
+- 🔌 **Multi-Provider Support** – Monitor usage across multiple AI tools
+- ⚡ **Instant Toggle** – Enable/disable providers with one click
+- 📈 **Dynamic Tray Icon** – Usage meter updates in real-time
+- 🔗 **Quick Links** – Jump to dashboards and status pages
+- 🪟 **Frameless & Resizable** – Drag to move, resize as needed
+
+---
+
+## 📸 Screenshots
+
+<p align="center">
+  <img src="screenshots/tray-popup.png" alt="Tray Popup" width="350">
+  <br>
+  <em>System tray popup showing Antigravity usage stats</em>
+</p>
+
+<p align="center">
+  <img src="screenshots/settings.png" alt="Settings Window" width="500">
+  <br>
+  <em>Settings window with provider configuration</em>
+</p>
+
+---
+
+## 📥 Installation
+
+### Option 1: Download Installer (Recommended)
+1. Go to [Releases](https://github.com/steipete/UsageBar/releases)
+2. Download `UsageBar-Setup.exe`
+3. Run the installer
+4. Launch UsageBar from Start Menu or Desktop
+
+### Option 2: Portable Version
+1. Download `UsageBar-Portable.zip` from [Releases](https://github.com/steipete/UsageBar/releases)
+2. Extract to any folder
+3. Run `UsageBar.exe`
+
+### Option 3: Build from Source
 ```bash
-brew install --cask steipete/tap/codexbar
-```
-Upgrade:
-```bash
-brew upgrade --cask steipete/tap/codexbar
-```
+# Clone the repository
+git clone https://github.com/steipete/UsageBar.git
+cd UsageBar
 
-### First run (developer-friendly)
-- Open Settings → Providers and enable what you use.
-- Install/log in to the provider CLIs you rely on (Codex, Claude, Gemini, Antigravity).
-- Optional: Settings → General → “Access OpenAI via web” to add Codex dashboard extras.
+# Install dependencies
+npm install
 
-## Providers
+# Run in development
+npm run dev
 
-### Codex
-Local Codex CLI RPC with PTY fallback; optional OpenAI web dashboard for code review remaining, usage breakdown, and credits history. More: [docs/codex.md](docs/codex.md).
-
-### Claude Code
-OAuth API or browser cookies with CLI PTY fallback; shows session + weekly usage (and model-specific weekly when available). More: [docs/claude.md](docs/claude.md).
-
-### Cursor
-Browser session cookies to fetch plan + on-demand usage and billing resets. More: [docs/cursor.md](docs/cursor.md).
-
-### Gemini
-OAuth-backed quota API using Gemini CLI credentials (no browser cookies). More: [docs/gemini.md](docs/gemini.md).
-
-### Antigravity
-Local Antigravity language server probe; no external auth. More: [docs/antigravity.md](docs/antigravity.md).
-
-### Droid (Factory)
-Browser cookies + WorkOS token flows to fetch Factory usage and billing window. More: [docs/factory.md](docs/factory.md).
-
-### Copilot
-GitHub device flow + Copilot internal usage API. More: [docs/copilot.md](docs/copilot.md).
-
-### z.ai
-API token via Keychain or env var for quota + MCP windows. More: [docs/zai.md](docs/zai.md).
-
-Open to new providers — see the authoring guide at [docs/provider.md](docs/provider.md).
-
-## Icon & Screenshot
-The menu bar icon is a tiny two-bar meter:
-- Top bar: 5‑hour/session window. If weekly is exhausted, it becomes a thicker credits bar.
-- Bottom bar: weekly window (hairline).
-- Errors/stale data dim the icon; status overlays indicate incidents.
-
-![CodexBar Screenshot](codexbar.png)
-
-## Features
-- Multi-provider menu bar with per-provider toggles (Settings → Providers).
-- Session + weekly meters with reset countdowns.
-- Optional Codex web dashboard enrichments (code review remaining, usage breakdown, credits history).
-- Local cost-usage scan for Codex + Claude (last 30 days).
-- Provider status polling with incident badges in the menu and icon overlay.
-- Merge Icons mode to combine providers into one status item + switcher.
-- Refresh cadence presets (manual, 1m, 2m, 5m, 15m).
-- Bundled CLI (`codexbar`) for scripts and CI; Linux CLI builds available.
-- WidgetKit widget mirrors the menu card snapshot.
-- Privacy-first: on-device parsing by default; browser cookies are opt-in and reused (no passwords stored).
-
-## Privacy note
-Wondering if CodexBar scans your disk? It doesn't; see the discussion and audit notes in [issue #12](https://github.com/steipete/CodexBar/issues/12).
-
-## macOS permissions (why they’re needed)
-- **Full Disk Access (optional)**: only required to read Safari cookies/local storage for web-based providers (Codex web, Claude web, Cursor, Droid/Factory). If you don’t grant it, use Chrome/Firefox cookies or CLI-only sources instead.
-- **Keychain access (prompted by macOS)**:
-  - Chrome cookie import needs the “Chrome Safe Storage” key to decrypt cookies.
-  - Claude OAuth credentials (written by the Claude CLI) are read from Keychain when present.
-  - z.ai and Copilot API tokens are stored in Keychain from Preferences → Providers.
-- **Files & Folders prompts (folder/volume access)**: CodexBar launches provider CLIs (codex/claude/gemini/antigravity). If those CLIs read a project directory or external drive, macOS may ask CodexBar for that folder/volume (e.g., Desktop or an external volume). This is driven by the CLI’s working directory, not background disk scanning.
-- **What we do not request**: no Screen Recording, Accessibility, or Automation permissions; no passwords are stored (browser cookies are reused when you opt in).
-
-## Docs
-- Providers overview: [docs/providers.md](docs/providers.md)
-- Provider authoring: [docs/provider.md](docs/provider.md)
-- UI & icon notes: [docs/ui.md](docs/ui.md)
-- CLI reference: [docs/cli.md](docs/cli.md)
-- Architecture: [docs/architecture.md](docs/architecture.md)
-- Refresh loop: [docs/refresh-loop.md](docs/refresh-loop.md)
-- Status polling: [docs/status.md](docs/status.md)
-- Sparkle updates: [docs/sparkle.md](docs/sparkle.md)
-- Release checklist: [docs/RELEASING.md](docs/RELEASING.md)
-
-## Getting started (dev)
-- Clone the repo and open it in Xcode or run the scripts directly.
-- Launch once, then toggle providers in Settings → Providers.
-- Install provider CLIs and log in (Codex, Claude, Gemini, Antigravity) to see data.
-- Optional: enable “Access OpenAI via web” for Codex dashboard extras.
-
-## Build from source
-```bash
-swift build -c release          # or debug for development
-./Scripts/package_app.sh        # builds CodexBar.app in-place
-CODEXBAR_SIGNING=adhoc ./Scripts/package_app.sh  # ad-hoc signing (no Apple Developer account)
-open CodexBar.app
+# Build installer
+npm run package
 ```
 
-Dev loop:
+---
+
+## 🔌 Supported Providers
+
+| Provider | Status | Detection Method |
+|----------|--------|------------------|
+| **Antigravity (Windsurf)** | ✅ Working | Auto-detect via process |
+| **Cursor** | ✅ Working | Auto-detect via config |
+| **Claude Code** | 🔧 CLI Required | `claude login` |
+| **Codex (OpenAI)** | 🔧 CLI Required | `codex` CLI auth |
+| **GitHub Copilot** | 🔧 CLI Required | `gh auth login` |
+| **Gemini** | 🔑 API Key | Settings → API Key |
+| **Factory** | 🔧 Configure | Settings |
+| **z.ai** | 🔧 Configure | Settings |
+
+---
+
+## ⚙️ Configuration
+
+### General Settings
+- **Refresh Interval**: 1, 2, 5, 10, 15, or 30 minutes
+- **Reset Session Daily**: Auto-reset session meter every 24 hours
+
+### Provider Settings
+Each provider can be individually enabled/disabled. Some require additional configuration:
+- Providers with auto-detection work out-of-the-box
+- CLI-based providers need you to run their login command
+- API-based providers need an API key in Settings
+
+---
+
+## 🛠️ Development
+
 ```bash
-./Scripts/compile_and_run.sh
+# Install dependencies
+npm install
+
+# Run development mode
+npm run dev
+
+# Build for production
+npm run package
+
+# Clean build artifacts
+npm run clean
 ```
 
-## Related (from Peter)
-- ✂️ [Trimmy](https://github.com/steipete/Trimmy) — “Paste once, run once.” Flatten multi-line shell snippets so they paste and run.
-- 🧳 [MCPorter](https://mcporter.dev) — TypeScript toolkit + CLI for Model Context Protocol servers.
-- Cross-promote: Download CodexBar at [codexbar.app](https://codexbar.app) and Trimmy at [trimmy.app](https://trimmy.app).
+### Tech Stack
+- **Electron** – Cross-platform desktop framework
+- **TypeScript** – Type-safe JavaScript
+- **electron-builder** – Packaging and distribution
+- **electron-store** – Persistent settings storage
 
-## Credits
-Inspired by [ccusage](https://github.com/ryoppippi/ccusage) (MIT), specifically the cost usage tracking.
+---
 
-## License
-MIT • Peter Steinberger ([steipete](https://twitter.com/steipete))
+## 🙏 Acknowledgments
+
+- **[CodexBar](https://github.com/mzbac/CodexBar)** by [@mzbac](https://github.com/mzbac) – The original macOS inspiration for this project. UsageBar is the Windows counterpart, bringing the same great experience to Windows users.
+- Thanks to all the AI coding tool providers for making development more productive!
+
+---
+
+## 💖 Support
+
+If you find UsageBar helpful, consider supporting the development:
+
+<a href="https://ko-fi.com/ai_dev_2024" target="_blank">
+  <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support on Ko-fi">
+</a>
+
+---
+
+## 📄 License
+
+MIT License – feel free to use, modify, and distribute.
+
+---
+
+<p align="center">
+  Made with ❤️ for the Windows developer community
+</p>

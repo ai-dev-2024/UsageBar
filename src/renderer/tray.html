@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UsageBar Tray</title>
+    <style>
+        :root {
+            --bg-gradient: linear-gradient(135deg, rgba(255, 235, 255, 0.95) 0%, rgba(240, 230, 255, 0.95) 50%, rgba(220, 240, 255, 0.95) 100%);
+            --text-primary: #1d1d1f;
+            --text-secondary: #6e6e73;
+            --meter-bg: rgba(0, 0, 0, 0.06);
+            --meter-fill: #5FBFA0;
+            --separator: rgba(0, 0, 0, 0.08);
+            --hover-bg: rgba(0, 0, 0, 0.04);
+            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            cursor: default;
+        }
+
+        body {
+            font-family: var(--font-family);
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(255, 235, 255, 1) 0%, rgba(240, 230, 255, 1) 50%, rgba(220, 240, 255, 1) 100%);
+        }
+
+        .tray-container {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-gradient);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 12px;
+            padding-bottom: 6px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow-y: auto;
+            overflow-x: hidden;
+        }
+
+        /* Provider Switcher Bar - draggable for moving window */
+        .provider-tabs {
+            padding: 12px 14px 4px;
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            min-height: 52px;
+            -webkit-app-region: drag;
+        }
+
+        .provider-tab {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            cursor: pointer;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            border: 2px solid transparent;
+            position: relative;
+            -webkit-app-region: no-drag;
+        }
+
+        .provider-tab:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .provider-tab.active {
+            border-color: rgba(255, 255, 255, 0.8);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .provider-tab svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Icon Background Colors & Gradients */
+        .bg-antigravity {
+            background: transparent;
+        }
+
+        .bg-cursor {
+            background: #000000;
+        }
+
+        .bg-claude {
+            background: #d97757;
+        }
+
+        .bg-codex {
+            background: #10a37f;
+        }
+
+        .bg-copilot {
+            background: #000000;
+        }
+
+        .bg-gemini {
+            background: linear-gradient(135deg, #4285f4, #ea4335);
+        }
+
+        .bg-factory {
+            background: #f59e0b;
+        }
+
+        .bg-zai {
+            background: #ec4899;
+        }
+
+        /* Header */
+        .header {
+            padding: 12px 18px 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-top: 4px;
+        }
+
+        .provider-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-line {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .account-section {
+            text-align: right;
+        }
+
+        .email {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-bottom: 1px;
+        }
+
+        .plan-badge {
+            display: inline-block;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            background: rgba(95, 191, 160, 0.2);
+            color: #5FBFA0;
+            margin-left: 4px;
+        }
+
+        .credits-display {
+            padding: 8px 18px;
+        }
+
+        .credits-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .credits-value {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .divider {
+            height: 1px;
+            background: var(--separator);
+            margin: 6px 18px;
+        }
+
+        /* Meters */
+        .usage-section {
+            padding: 8px 18px 12px;
+        }
+
+        .usage-group {
+            margin-bottom: 14px;
+        }
+
+        .usage-label {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+
+        .meter-container {
+            height: 6px;
+            background: var(--meter-bg);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        .meter-fill {
+            height: 100%;
+            background: var(--meter-fill);
+            border-radius: 3px;
+            width: 0%;
+            /* No animation - static display */
+        }
+
+        .usage-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Actions */
+        .actions-list {
+            padding: 4px 0;
+        }
+
+        .action-item {
+            padding: 7px 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .action-item:hover {
+            background: var(--hover-bg);
+        }
+
+        .action-icon {
+            width: 16px;
+            opacity: 0.7;
+            display: flex;
+            justify-content: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="tray-container">
+        <div class="provider-tabs" id="provider-tabs"></div>
+
+        <div class="header">
+            <div class="provider-section">
+                <div class="provider-name" id="p-name">UsageBar</div>
+                <div class="status-line" id="p-status">Loading...</div>
+            </div>
+            <div class="account-section">
+                <div class="email" id="p-email"></div>
+                <span class="plan-badge" id="p-plan" style="display:none;"></span>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="usage-section" id="usage-content">
+            <div class="usage-group">
+                <div class="usage-label">Session</div>
+                <div class="meter-container">
+                    <div class="meter-fill" id="s-fill"></div>
+                </div>
+                <div class="usage-meta"><span id="s-text">--%</span><span class="reset-time" id="s-reset"></span></div>
+            </div>
+            <div class="usage-group" id="w-group" style="display:none;">
+                <div class="usage-label">Weekly</div>
+                <div class="meter-container">
+                    <div class="meter-fill" id="w-fill"></div>
+                </div>
+                <div class="usage-meta"><span id="w-text">--%</span><span class="reset-time" id="w-reset"></span></div>
+            </div>
+            <div class="usage-group" id="credits-group" style="display:none;">
+                <div class="usage-label">Credits</div>
+                <div class="usage-meta"><span id="credits-value">--</span></div>
+            </div>
+        </div>
+
+        <div class="divider"></div>
+
+        <div class="actions-list">
+            <div class="action-item" id="act-refresh"><span class="action-icon">↻</span> Refresh Now</div>
+            <div class="action-item" id="act-dash"><span class="action-icon">📊</span> Usage Dashboard</div>
+            <div class="action-item" id="act-status"><span class="action-icon">⚡</span> Status Page</div>
+        </div>
+        <div class="divider"></div>
+        <div class="actions-list">
+            <div class="action-item" id="act-settings"><span class="action-icon">⚙️</span> Settings...</div>
+            <div class="action-item" id="act-about"><span class="action-icon">ℹ️</span> About UsageBar</div>
+            <div class="action-item" id="act-quit"><span class="action-icon">✕</span> Quit</div>
+        </div>
+    </div>
+
+    <script>
+        const ipc = window.usagebar;
+        const els = {
+            tabs: document.getElementById('provider-tabs'), name: document.getElementById('p-name'), status: document.getElementById('p-status'), email: document.getElementById('p-email'), plan: document.getElementById('p-plan'),
+            sFill: document.getElementById('s-fill'), sText: document.getElementById('s-text'), sReset: document.getElementById('s-reset'),
+            wGroup: document.getElementById('w-group'), wFill: document.getElementById('w-fill'), wText: document.getElementById('w-text'), wReset: document.getElementById('w-reset'),
+            creditsGroup: document.getElementById('credits-group'), creditsValue: document.getElementById('credits-value')
+        };
+
+        // PREMIUM SVG ICONS - Meticulously sourced paths
+        const svgs = {
+            antigravity: '<img src="antigravity.png" style="width:20px;height:20px;object-fit:contain;">', // User provided icon
+            cursor: '<svg fill="#fff" viewBox="0 0 24 24"><path d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></svg>', // Official Cursor
+            claude: '<svg fill="#fff" viewBox="0 0 16 16"><path d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212"/></svg>', // Official Anthropic
+            codex: '<img src="codex.png" style="width:20px;height:20px;object-fit:contain;">', // OpenAI logo
+            copilot: '<svg fill="#fff" viewBox="0 0 24 24"><path d="M23.922 16.997C23.061 18.492 18.063 22.02 12 22.02 5.937 22.02.939 18.492.078 16.997A.641.641 0 0 1 0 16.741v-2.869a.883.883 0 0 1 .053-.22c.372-.935 1.347-2.292 2.605-2.656.167-.429.414-1.055.644-1.517a10.098 10.098 0 0 1-.052-1.086c0-1.331.282-2.499 1.132-3.368.397-.406.89-.717 1.474-.952C7.255 2.937 9.248 1.98 11.978 1.98c2.731 0 4.767.957 6.166 2.093.584.235 1.077.546 1.474.952.85.869 1.132 2.037 1.132 3.368 0 .368-.014.733-.052 1.086.23.462.477 1.088.644 1.517 1.258.364 2.233 1.721 2.605 2.656a.841.841 0 0 1 .053.22v2.869a.641.641 0 0 1-.078.256Zm-11.75-5.992h-.344a4.359 4.359 0 0 1-.355.508c-.77.947-1.918 1.492-3.508 1.492-1.725 0-2.989-.359-3.782-1.259a2.137 2.137 0 0 1-.085-.104L4 11.746v6.585c1.435.779 4.514 2.179 8 2.179 3.486 0 6.565-1.4 8-2.179v-6.585l-.098-.104s-.033.045-.085.104c-.793.9-2.057 1.259-3.782 1.259-1.59 0-2.738-.545-3.508-1.492a4.359 4.359 0 0 1-.355-.508Zm2.328 3.25c.549 0 1 .451 1 1v2c0 .549-.451 1-1 1-.549 0-1-.451-1-1v-2c0-.549.451-1 1-1Zm-5 0c.549 0 1 .451 1 1v2c0 .549-.451 1-1 1-.549 0-1-.451-1-1v-2c0-.549.451-1 1-1Zm3.313-6.185c.136 1.057.403 1.913.878 2.497.442.544 1.134.938 2.344.938 1.573 0 2.292-.337 2.657-.751.384-.435.558-1.15.558-2.361 0-1.14-.243-1.847-.705-2.319-.477-.488-1.319-.862-2.824-1.025-1.487-.161-2.192.138-2.533.529-.269.307-.437.808-.438 1.578v.021c0 .265.021.562.063.893Zm-1.626 0c.042-.331.063-.628.063-.894v-.02c-.001-.77-.169-1.271-.438-1.578-.341-.391-1.046-.69-2.533-.529-1.505.163-2.347.537-2.824 1.025-.462.472-.705 1.179-.705 2.319 0 1.211.175 1.926.558 2.361.365.414 1.084.751 2.657.751 1.21 0 1.902-.394 2.344-.938.475-.584.742-1.44.878-2.497Z"/></svg>', // Official GitHub
+            gemini: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 0 C 12 8 17 12 24 12 C 17 12 12 17 12 24 C 12 17 8 12 0 12 C 8 12 12 8 12 0 Z"/></svg>', // Official Gemini Sparkle
+            factory: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h6a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h6V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5A2.5 2.5 0 0 0 7.5 18A2.5 2.5 0 0 0 10 15.5A2.5 2.5 0 0 0 7.5 13M16.5 13A2.5 2.5 0 0 0 14 15.5A2.5 2.5 0 0 0 16.5 18A2.5 2.5 0 0 0 19 15.5A2.5 2.5 0 0 0 16.5 13Z"/></svg>', // Robot/Droid Head
+            zai: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M4 6h16v3h-10.5l10.5 10v3h-16v-3h10.5l-10.5-10v-3z"/></svg>' // Bold Z
+        };
+
+        const providersMeta = {
+            antigravity: { name: 'Antigravity', svg: svgs.antigravity, bg: 'bg-antigravity' },
+            cursor: { name: 'Cursor', svg: svgs.cursor, bg: 'bg-cursor' },
+            claude: { name: 'Claude', svg: svgs.claude, bg: 'bg-claude' },
+            codex: { name: 'Codex', svg: svgs.codex, bg: 'bg-codex' },
+            copilot: { name: 'Copilot', svg: svgs.copilot, bg: 'bg-copilot' },
+            gemini: { name: 'Gemini', svg: svgs.gemini, bg: 'bg-gemini' },
+            factory: { name: 'Factory', svg: svgs.factory, bg: 'bg-factory' },
+            zai: { name: 'z.ai', svg: svgs.zai, bg: 'bg-zai' }
+        };
+
+        let activeProviderId = null;
+        let lastUsageData = {};
+        let enabledProviders = [];
+
+        function renderTabs(usage) {
+            // Only show tabs for providers that are BOTH enabled AND have data
+            const activeIds = Object.keys(usage).filter(k =>
+                usage[k] && !usage[k].disabled && enabledProviders.includes(k)
+            );
+            // Sort: Antigravity, Cursor, Claude, then alphabetical
+            const priority = ['antigravity', 'cursor', 'claude'];
+            activeIds.sort((a, b) => {
+                let pa = priority.indexOf(a), pb = priority.indexOf(b);
+                if (pa !== -1 && pb !== -1) return pa - pb;
+                if (pa !== -1) return -1;
+                if (pb !== -1) return 1;
+                return a.localeCompare(b);
+            });
+
+            els.tabs.innerHTML = '';
+
+            if (activeIds.length === 0) {
+                els.tabs.innerHTML = '<div style="color:#86868b;font-size:12px;padding:8px;">No providers enabled</div>';
+                return;
+            }
+
+            activeIds.forEach(id => {
+                const meta = providersMeta[id] || { name: id, svg: svgs.codex, bg: 'bg-codex' };
+                const tab = document.createElement('div');
+                tab.className = `provider-tab ${meta.bg} ${id === activeProviderId ? 'active' : ''}`;
+                tab.innerHTML = meta.svg;
+                tab.title = meta.name;
+                tab.onclick = () => {
+                    activeProviderId = id;
+                    if (ipc.setSelectedProvider) ipc.setSelectedProvider(id);
+                    updateView();
+                    renderTabs(lastUsageData);
+                };
+                els.tabs.appendChild(tab);
+            });
+
+            // Auto-select first if none selected
+            if ((!activeProviderId || !activeIds.includes(activeProviderId)) && activeIds.length > 0) {
+                activeProviderId = activeIds[0];
+                updateView();
+                renderTabs(lastUsageData); // re-render to visualy select
+            }
+        }
+
+        function updateView() {
+            if (!activeProviderId) {
+                els.name.textContent = 'UsageBar';
+                els.status.textContent = 'Ready';
+                return;
+            }
+            const data = lastUsageData[activeProviderId];
+            if (!data) {
+                els.name.textContent = 'UsageBar'; // Fallback
+                return;
+            }
+            const meta = providersMeta[activeProviderId] || { name: data.displayName };
+
+            els.name.textContent = meta.name;
+            els.email.textContent = data.accountEmail || '';
+            if (data.accountPlan) {
+                els.plan.textContent = data.accountPlan;
+                els.plan.style.display = 'inline-block';
+            } else {
+                els.plan.style.display = 'none';
+            }
+
+            // Setup instructions for each provider
+            const setupInstructions = {
+                antigravity: 'Open VS Code/Windsurf with Antigravity extension',
+                cursor: 'Open Cursor IDE and sign in',
+                claude: 'Run "claude login" in terminal',
+                codex: 'Run "codex" CLI and authenticate',
+                copilot: 'Run "gh auth login" in terminal',
+                gemini: 'Add your Gemini API key in Settings',
+                factory: 'Configure Factory in Settings',
+                zai: 'Configure z.ai in Settings'
+            };
+
+            // If there's an error or no data, show "Yet to be configured"
+            if (data.error || (!data.primary && !data.secondary)) {
+                els.status.textContent = 'Yet to be configured';
+                els.status.style.color = '#f59e0b';
+
+                // Hide usage bars
+                els.sFill.style.width = '0%';
+                els.sText.textContent = setupInstructions[activeProviderId] || 'Configure in Settings';
+                els.sReset.textContent = '';
+                els.wGroup.style.display = 'none';
+            } else {
+                els.status.textContent = 'Updated just now';
+                els.status.style.color = 'var(--text-secondary)';
+
+                if (data.primary) {
+                    const left = Math.max(0, 100 - data.primary.usedPercent);
+                    els.sFill.style.width = `${left}%`;
+                    els.sText.textContent = `${left.toFixed(0)}% available`;
+                    els.sFill.style.backgroundColor = left > 20 ? '#5FBFA0' : '#ef4444';
+                    els.sReset.textContent = data.primary.resetsAt ? `Resets ${new Date(data.primary.resetsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
+                }
+
+                if (data.secondary) {
+                    els.wGroup.style.display = 'block';
+                    const left = Math.max(0, 100 - data.secondary.usedPercent);
+                    els.wFill.style.width = `${left}%`;
+                    els.wText.textContent = `${left.toFixed(0)}% available`;
+                    els.wReset.textContent = data.secondary.resetsAt ? `Resets ${new Date(data.secondary.resetsAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}` : '';
+                } else {
+                    els.wGroup.style.display = 'none';
+                }
+            }
+
+            // Credits display
+            if (data.credits && data.credits.balance) {
+                els.creditsGroup.style.display = 'block';
+                els.creditsValue.textContent = data.credits.unlimited ? 'Unlimited' : `${data.credits.balance} left`;
+            } else {
+                els.creditsGroup.style.display = 'none';
+            }
+
+            // No auto-resize - user controls window size manually
+        }
+
+        document.getElementById('act-refresh').onclick = () => { els.status.textContent = 'Refreshing...'; ipc.refreshUsage(); };
+        document.getElementById('act-settings').onclick = () => ipc.openSettings();
+        document.getElementById('act-quit').onclick = () => ipc.quit();
+        document.getElementById('act-dash').onclick = () => {
+            const data = lastUsageData[activeProviderId];
+            const fallbackMap = { 'antigravity': 'https://windsurf.ai/account', 'cursor': 'https://www.cursor.com/settings', 'claude': 'https://console.anthropic.com/settings/usage', 'codex': 'https://platform.openai.com/usage' };
+            const url = data?.dashboardUrl || fallbackMap[activeProviderId] || 'https://google.com';
+            ipc.openUrl(url);
+        };
+        document.getElementById('act-status').onclick = () => {
+            const data = lastUsageData[activeProviderId];
+            const fallbackMap = { 'antigravity': 'https://status.codeium.com', 'cursor': 'https://status.cursor.com', 'claude': 'https://status.anthropic.com', 'codex': 'https://status.openai.com' };
+            const url = data?.statusPageUrl || fallbackMap[activeProviderId] || 'https://google.com';
+            ipc.openUrl(url);
+        };
+        document.getElementById('act-about').onclick = () => {
+            alert('UsageBar v1.0.0\n\nWindows system tray app for AI coding tool usage stats.\n\nInspired by CodexBar for macOS.');
+        };
+
+        // Initialize - fetch enabled providers and usage, then render
+        Promise.all([ipc.getEnabledProviders(), ipc.getUsage()]).then(([enabled, usage]) => {
+            enabledProviders = enabled || [];
+            lastUsageData = usage;
+            renderTabs(usage);
+            updateView();
+        });
+
+        if (ipc.onUsageUpdate) ipc.onUsageUpdate(u => {
+            lastUsageData = u;
+            renderTabs(u);
+            updateView();
+        });
+
+        // Real-time update when providers are toggled in settings
+        if (ipc.onEnabledProvidersUpdate) ipc.onEnabledProvidersUpdate(providers => {
+            enabledProviders = providers;
+            renderTabs(lastUsageData);
+            updateView();
+        });
+    </script>
+</body>
+
+</html>

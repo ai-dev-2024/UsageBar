@@ -1,26 +1,22 @@
-# Xcode user/session
-xcuserdata/
+# Dependencies
+node_modules/
 
-# Build products
-.build/
-DerivedData
+# Build output
+dist/
+release/
 
-# Bundles / artifacts
-CodexBar.app
-Codexbar.app
-*.ipa
-*.dSYM*
-*.zip
-*.delta
-*.dmg
-*.pkg
-*.tar.gz
-*.tgz
-Icon.iconset
+# IDE
+.vscode/
+.idea/
 
-# Misc
+# OS files
 .DS_Store
+Thumbs.db
 
-# Swift Package Manager metadata (leave sources tracked)
-# Packages/
-# Package.resolved
+# Environment variables
+.env
+.env.local
+
+# Logs
+*.log
+npm-debug.log*

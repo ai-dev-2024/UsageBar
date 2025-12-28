@@ -1,20 +1,49 @@
 {
-  "name": "codexbar",
-  "private": true,
+  "name": "usagebar",
+  "version": "1.0.0",
+  "description": "Windows system tray app showing AI coding tool usage stats",
+  "main": "dist/main/index.js",
+  "author": "UsageBar",
+  "license": "MIT",
   "scripts": {
-    "start": "./Scripts/compile_and_run.sh",
-    "start:debug": "./Scripts/compile_and_run.sh",
-    "start:release": "sh -c './Scripts/package_app.sh release && (pkill -x CodexBar || pkill -f CodexBar.app || true) && cd /Users/steipete/Projects/codexbar && open -n /Users/steipete/Projects/codexbar/CodexBar.app'",
-    "lint": "swiftlint --strict",
-    "format": "swiftformat Sources Tests",
-    "check": "swiftformat Sources Tests --lint && swiftlint --strict",
-    "docs:list": "node Scripts/docs-list.mjs",
-    "build": "swift build",
-    "test": "swift test",
-    "test:tty": "swift test --filter TTYIntegrationTests",
-    "test:live": "LIVE_TEST=1 swift test --filter LiveAccountTests",
-    "release": "./Scripts/package_app.sh release",
-    "restart": "pnpm start",
-    "stop": "pkill -x CodexBar || pkill -f CodexBar.app || true"
+    "dev": "npm run build && electron .",
+    "build": "tsc && npm run copy-assets",
+    "copy-assets": "powershell -Command \"if (-not (Test-Path dist/renderer)) { New-Item -ItemType Directory -Path dist/renderer }; Copy-Item src/renderer/*.html, src/renderer/*.png dist/renderer/\"",
+    "start": "electron .",
+    "package": "electron-builder --win",
+    "clean": "rimraf dist"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "electron-store": "^8.1.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "electron": "^28.0.0",
+    "electron-builder": "^24.9.0",
+    "rimraf": "^5.0.5",
+    "typescript": "^5.3.0"
+  },
+  "build": {
+    "appId": "com.usagebar.app",
+    "productName": "UsageBar",
+    "win": {
+      "icon": "assets/icon.ico",
+      "target": [
+        "dir",
+        "zip"
+      ]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    },
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "assets/**/*"
+    ]
   }
 }
