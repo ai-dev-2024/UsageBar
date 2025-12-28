@@ -6,15 +6,20 @@
   <title>UsageBar Settings</title>
   <style>
     :root {
-      --bg-color: #f5f5f7;
-      --sidebar-bg: #e8e8ed;
+      --bg-color: #ffffff;
+      --sidebar-bg: #f9f9fa;
       --card-bg: #ffffff;
-      --text-primary: #1d1d1f;
-      --text-secondary: #86868b;
-      --accent: #0071e3;
-      --border: #d2d2d7;
-      --danger: #ff3b30;
-      --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --text-primary: #09090b;
+      --text-secondary: #71717a;
+      --accent: #18181b;
+      /* Zinc 950 */
+      --accent-foreground: #ffffff;
+      --border: #e4e4e7;
+      --input-bg: #ffffff;
+      --input-border: #e4e4e7;
+      --ring: #18181b;
+      --danger: #ef4444;
+      --font-family: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
     body {
@@ -26,58 +31,64 @@
       background: var(--bg-color);
       color: var(--text-primary);
       overflow: hidden;
+      font-size: 14px;
+      -webkit-font-smoothing: antialiased;
     }
 
     /* Sidebar */
     .sidebar {
-      width: 220px;
+      width: 240px;
       background: var(--sidebar-bg);
       border-right: 1px solid var(--border);
       display: flex;
       flex-direction: column;
-      padding-top: 20px;
+      padding: 24px 12px;
     }
 
     .sidebar-title {
-      font-size: 12px;
+      font-size: 11px;
       font-weight: 600;
       color: var(--text-secondary);
-      padding: 0 20px 10px;
+      padding: 0 12px 12px;
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.05em;
     }
 
     .nav-item {
-      padding: 10px 20px;
+      padding: 8px 12px;
       display: flex;
       align-items: center;
-      gap: 10px;
+      gap: 12px;
       cursor: pointer;
-      transition: background 0.1s;
+      border-radius: 6px;
+      transition: all 0.2s;
       font-size: 14px;
-      color: var(--text-primary);
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 2px;
     }
 
     .nav-item:hover {
-      background: rgba(0, 0, 0, 0.05);
+      background: rgba(0, 0, 0, 0.04);
+      color: var(--text-primary);
     }
 
     .nav-item.active {
-      background: rgba(0, 0, 0, 0.1);
-      font-weight: 500;
+      background: #e4e4e7;
+      color: var(--text-primary);
     }
 
     .nav-icon {
-      width: 24px;
-      height: 24px;
-      border-radius: 6px;
+      width: 20px;
+      height: 20px;
       display: flex;
       align-items: center;
       justify-content: center;
       flex-shrink: 0;
     }
 
-    .nav-icon svg {
+    .nav-icon svg,
+    .nav-icon img {
       width: 16px;
       height: 16px;
     }
@@ -85,59 +96,100 @@
     /* Main Content */
     .main {
       flex: 1;
-      padding: 30px 40px;
+      padding: 40px 48px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
+      max-width: 800px;
     }
 
     .header {
-      margin-bottom: 30px;
+      margin-bottom: 32px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      gap: 20px;
-      flex-wrap: wrap;
+      gap: 24px;
     }
 
     .page-title {
       font-size: 24px;
-      font-weight: 700;
+      font-weight: 600;
+      letter-spacing: -0.02em;
+    }
+
+    /* Components */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      height: 36px;
+      padding: 0 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid transparent;
+      outline: none;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-foreground);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+    }
+
+    .btn-danger {
+      background: #fee2e2;
+      color: #991b1b;
+      border-color: transparent;
+    }
+
+    .btn-danger:hover {
+      background: #fecaca;
     }
 
     /* Forms */
     .form-group {
-      margin-bottom: 20px;
+      margin-bottom: 24px;
     }
 
     .form-label {
       display: block;
-      font-size: 13px;
+      font-size: 14px;
       font-weight: 500;
       margin-bottom: 8px;
       color: var(--text-primary);
     }
 
-    .form-input {
+    .form-input,
+    select {
       width: 100%;
-      padding: 8px 12px;
-      border: 1px solid var(--border);
+      height: 36px;
+      padding: 0 12px;
+      border: 1px solid var(--input-border);
+      background: var(--input-bg);
       border-radius: 6px;
       font-size: 14px;
+      color: var(--text-primary);
       outline: none;
-      transition: border-color 0.2s;
+      transition: all 0.2s;
     }
 
-    .form-input:focus {
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(0, 113, 227, 0.1);
+    .form-input:focus,
+    select:focus {
+      border-color: var(--ring);
+      box-shadow: 0 0 0 1px var(--ring);
     }
 
     .form-hint {
-      font-size: 12px;
+      font-size: 13px;
       color: var(--text-secondary);
       margin-top: 6px;
-      line-height: 1.4;
+      line-height: 1.5;
     }
 
     /* Toggles */
@@ -145,7 +197,7 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 12px 0;
+      padding: 16px 0;
       border-bottom: 1px solid var(--border);
     }
 
@@ -153,16 +205,11 @@
       border-bottom: none;
     }
 
-    .toggle-label {
-      font-size: 14px;
-      font-weight: 500;
-    }
-
     .switch {
       position: relative;
       display: inline-block;
-      width: 40px;
-      height: 24px;
+      width: 36px;
+      height: 20px;
     }
 
     .switch input {
@@ -178,22 +225,22 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #ccc;
-      transition: .4s;
-      border-radius: 24px;
+      background-color: #e4e4e7;
+      transition: .2s;
+      border-radius: 20px;
     }
 
     .slider:before {
       position: absolute;
       content: "";
-      height: 20px;
-      width: 20px;
+      height: 16px;
+      width: 16px;
       left: 2px;
       bottom: 2px;
       background-color: white;
-      transition: .4s;
+      transition: .2s;
       border-radius: 50%;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
     }
 
     input:checked+.slider {
@@ -204,43 +251,9 @@
       transform: translateX(16px);
     }
 
-    /* Buttons */
-    .btn {
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-size: 13px;
+    .toggle-label {
+      font-size: 14px;
       font-weight: 500;
-      cursor: pointer;
-      border: 1px solid transparent;
-      transition: all 0.2s;
-    }
-
-    .btn-primary {
-      background: var(--accent);
-      color: white;
-    }
-
-    .btn-primary:hover {
-      background: #0077ed;
-    }
-
-    .btn-secondary {
-      background: white;
-      border-color: var(--border);
-      color: var(--text-primary);
-    }
-
-    .btn-secondary:hover {
-      background: #fafafa;
-    }
-
-    .btn-danger {
-      color: var(--danger);
-      background: rgba(255, 59, 48, 0.1);
-    }
-
-    .btn-danger:hover {
-      background: rgba(255, 59, 48, 0.2);
     }
 
     /* Provider Colors */
@@ -285,7 +298,7 @@
     <div style="flex:1"></div>
     <div class="sidebar-title">General</div>
     <div class="nav-item" id="nav-general">
-      <div class="nav-icon" style="background:#888"><svg fill="#fff" viewBox="0 0 24 24">
+      <div class="nav-icon" style="background:#71717a"><svg fill="#fff" viewBox="0 0 24 24">
           <path d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z" />
           <path
             d="M20 12c0-4.42-3.58-8-8-8S4 7.58 4 12s3.58 8 8 8 8-3.58 8-8zM6 12c0-3.31 2.69-6 6-6s6 2.69 6 6-2.69 6-6 6-6-2.69-6-6z" />
@@ -367,7 +380,7 @@
         content.innerHTML = `
           <div class="form-group">
             <label class="form-label">Refresh Interval</label>
-            <select id="gen-interval" class="form-select">
+            <select id="gen-interval">
               <option value="1" ${currentInterval === 1 ? 'selected' : ''}>1 minute</option>
               <option value="2" ${currentInterval === 2 ? 'selected' : ''}>2 minutes</option>
               <option value="5" ${currentInterval === 5 ? 'selected' : ''}>5 minutes</option>

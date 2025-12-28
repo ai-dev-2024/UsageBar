@@ -7,14 +7,16 @@
     <title>UsageBar Tray</title>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, rgba(255, 235, 255, 0.95) 0%, rgba(240, 230, 255, 0.95) 50%, rgba(220, 240, 255, 0.95) 100%);
-            --text-primary: #1d1d1f;
-            --text-secondary: #6e6e73;
-            --meter-bg: rgba(0, 0, 0, 0.06);
-            --meter-fill: #5FBFA0;
-            --separator: rgba(0, 0, 0, 0.08);
-            --hover-bg: rgba(0, 0, 0, 0.04);
-            --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            /* Zinc-inspired gradient */
+            --bg-gradient: linear-gradient(to bottom right, #ffffff, #fafafa);
+            --text-primary: #09090b;
+            --text-secondary: #71717a;
+            --meter-bg: rgba(24, 24, 27, 0.06);
+            --meter-fill: #14b8a6;
+            /* Teal 500 */
+            --separator: rgba(24, 24, 27, 0.08);
+            --hover-bg: rgba(24, 24, 27, 0.04);
+            --font-family: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         }
 
         * {
@@ -486,7 +488,7 @@
             ipc.openUrl(url);
         };
         document.getElementById('act-about').onclick = () => {
-            alert('UsageBar v1.0.0\n\nWindows system tray app for AI coding tool usage stats.\n\nInspired by CodexBar for macOS.');
+            alert('UsageBar v1.0.1\n\nMonitor your AI coding tool usage.\n\nCreated by the community.\nAcknowledgments: CodexBar (macOS)');
         };
 
         // Initialize - fetch enabled providers and usage, then render
