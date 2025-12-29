@@ -1,0 +1,42 @@
+# UsageBar CI/CD Pipeline
+#
+# Runs on every push and pull request to ensure the app builds correctly.
+# This helps contributors add features without breaking existing functionality.
+
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: windows-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: TypeScript build check
+        run: npm run build
+      
+      - name: Verify build output
+        run: |
+          if (Test-Path dist/main/index.js) {
+            Write-Host "✅ Build successful - main entry point exists"
+          } else {
+            Write-Host "❌ Build failed - main entry point missing"
+            exit 1
+          }
+        shell: pwsh
