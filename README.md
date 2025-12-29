@@ -28,6 +28,8 @@
 
 - 🖥️ **System Tray Integration** – Lives in your taskbar, always accessible
 - 📊 **Real-time Usage Meters** – Session and weekly usage at a glance
+- ⏱️ **Reset Countdown Timers** – Shows "Resets in 2h 15m" for quick reference
+- 🔔 **Quota Alert Notifications** – Windows toast notification when usage > 80%
 - 🔄 **Auto-Refresh** – Configurable refresh intervals (1-30 minutes)
 - 🎨 **Beautiful UI** – Modern, macOS-inspired glassmorphic design
 - 🔌 **Multi-Provider Support** – Monitor usage across multiple AI tools
