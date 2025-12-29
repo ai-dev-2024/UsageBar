@@ -28,16 +28,17 @@
 
 - 🖥️ **System Tray Integration** – Lives in your taskbar, always accessible
 - 📊 **Real-time Usage Meters** – Session and weekly usage at a glance
-- ⌨️ **Global Hotkey** – `Ctrl+Shift+U` to show/hide from anywhere
+- ⌨️ **Customizable Hotkey** – Default `Ctrl+Shift+U`, configurable in Settings
 - ⏱️ **Reset Countdown Timers** – Shows "Resets in 2h 15m" for quick reference
 - 🔔 **Quota Alert Notifications** – Windows toast notification when usage > 80%
 - 🔄 **Auto-Refresh** – Configurable refresh intervals (1-30 minutes)
-- 🎨 **Beautiful UI** – Modern, macOS-inspired glassmorphic design
+- 🎨 **Glassmorphism UI** – Modern gradient design with transparency slider
 - 🔌 **Multi-Provider Support** – Monitor usage across multiple AI tools
 - ⚡ **Instant Toggle** – Enable/disable providers with one click
 - 📈 **Dynamic Tray Icon** – Usage meter updates in real-time
 - 🔗 **Quick Links** – Jump to dashboards and status pages
 - 🪟 **Frameless & Resizable** – Drag to move, resize as needed
+- 🆕 **One-Click Updates** – Version badge shows when updates are available
 
 ---
 
@@ -46,13 +47,13 @@
 <p align="center">
   <img src="screenshots/tray-popup.png" alt="Tray Popup" width="350">
   <br>
-  <em>System tray popup showing Antigravity usage stats</em>
+  <em>System tray popup with transparent glass effect and usage stats</em>
 </p>
 
 <p align="center">
   <img src="screenshots/settings.png" alt="Settings Window" width="500">
   <br>
-  <em>Settings window with provider configuration</em>
+  <em>Settings window with gradient glassmorphism theme</em>
 </p>
 
 ---
@@ -61,14 +62,20 @@
 
 ### Windows (Portable) - Recommended
 
-> **Stable Version**: [v1.0.2](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.0.2) is the tested, stable release.
-> **Latest Version**: v1.2.0 has new features but is marked as pre-release for testing.
+> **Latest Version**: [v1.4.0](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.4.0) – Gradient theme, transparency slider, click-to-update
 
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
-2. Download `UsageBar-v1.3.0-Portable.zip`.
+2. Download `UsageBar-v1.4.0-Portable.zip`.
 3. Extract the ZIP file to a folder of your choice (e.g., `Documents\UsageBar`).
 4. Open the folder and double-click **`UsageBar.exe`** to run.
 5. *(Optional)* Right-click `UsageBar.exe` → "Send to" → "Desktop (create shortcut)" for easy access.
+
+### Auto-Updates
+
+UsageBar automatically checks for updates on launch. When an update is available:
+1. The version badge (top-right in Settings) changes to **"🔄 Update Available"**
+2. Click it to download the update
+3. Once downloaded, click **"✅ Install Update"** to restart with the new version
 
 ### Build from Source
 ```bash

@@ -21,6 +21,11 @@ export function setupAutoUpdater(): void {
     autoUpdater.on('update-available', (info) => {
         console.log('Update available:', info.version);
 
+        // Notify all browser windows (Settings) about the update
+        BrowserWindow.getAllWindows().forEach((win) => {
+            win.webContents.send('update-available', info.version);
+        });
+
         // Show notification
         if (Notification.isSupported()) {
             const notification = new Notification({
@@ -35,14 +40,22 @@ export function setupAutoUpdater(): void {
         }
     });
 
-    // Download progress
+    // Download progress - notify renderer
     autoUpdater.on('download-progress', (progress) => {
         console.log(`Download progress: ${progress.percent.toFixed(1)}%`);
+        BrowserWindow.getAllWindows().forEach((win) => {
+            win.webContents.send('update-download-progress', progress.percent);
+        });
     });
 
     // Update downloaded
     autoUpdater.on('update-downloaded', (info) => {
         console.log('Update downloaded:', info.version);
+
+        // Notify renderer that download is complete
+        BrowserWindow.getAllWindows().forEach((win) => {
+            win.webContents.send('update-downloaded', info.version);
+        });
 
         dialog.showMessageBox({
             type: 'info',
@@ -61,6 +74,9 @@ export function setupAutoUpdater(): void {
     // Error handling
     autoUpdater.on('error', (err) => {
         console.log('Auto-updater error:', err.message);
+        BrowserWindow.getAllWindows().forEach((win) => {
+            win.webContents.send('update-error', err.message);
+        });
     });
 }
 
@@ -68,4 +84,16 @@ export function checkForUpdates(): void {
     autoUpdater.checkForUpdates().catch((err) => {
         console.log('Manual update check failed:', err.message);
     });
+}
+
+// Start downloading update (called from renderer via IPC)
+export function downloadUpdate(): void {
+    autoUpdater.downloadUpdate().catch((err) => {
+        console.log('Download update failed:', err.message);
+    });
+}
+
+// Install already downloaded update
+export function installUpdate(): void {
+    autoUpdater.quitAndInstall(false, true);
 }

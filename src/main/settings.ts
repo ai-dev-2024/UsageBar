@@ -16,7 +16,10 @@ export interface AppSettings {
     refreshInterval: number; // in minutes
     autoStart: boolean;
     theme: 'light' | 'dark' | 'system';
+    hotkey: string; // Global hotkey (e.g., 'CommandOrControl+Shift+U')
+    popupOpacity: number; // Popup background opacity (0.1 to 1.0)
     windowBounds?: WindowBounds;
+    settingsWindowBounds?: WindowBounds;
 }
 
 const defaultSettings: AppSettings = {
@@ -24,7 +27,10 @@ const defaultSettings: AppSettings = {
     refreshInterval: 5,
     autoStart: false,
     theme: 'system',
+    hotkey: 'CommandOrControl+Shift+U',
+    popupOpacity: 0.35, // Default 35% opacity
     windowBounds: { width: 340, height: 480 },
+    settingsWindowBounds: { width: 800, height: 600 },
 };
 
 export class SettingsStore {
@@ -43,7 +49,10 @@ export class SettingsStore {
             refreshInterval: this.store.get('refreshInterval', defaultSettings.refreshInterval),
             autoStart: this.store.get('autoStart', defaultSettings.autoStart),
             theme: this.store.get('theme', defaultSettings.theme),
+            hotkey: this.store.get('hotkey', defaultSettings.hotkey),
+            popupOpacity: this.store.get('popupOpacity', defaultSettings.popupOpacity),
             windowBounds: this.store.get('windowBounds') || defaultSettings.windowBounds!,
+            settingsWindowBounds: this.store.get('settingsWindowBounds') || defaultSettings.settingsWindowBounds!,
         };
     }
 
@@ -60,8 +69,17 @@ export class SettingsStore {
         if (settings.theme !== undefined) {
             this.store.set('theme', settings.theme);
         }
+        if (settings.hotkey !== undefined) {
+            this.store.set('hotkey', settings.hotkey);
+        }
+        if (settings.popupOpacity !== undefined) {
+            this.store.set('popupOpacity', settings.popupOpacity);
+        }
         if (settings.windowBounds !== undefined) {
             this.store.set('windowBounds', settings.windowBounds);
+        }
+        if (settings.settingsWindowBounds !== undefined) {
+            this.store.set('settingsWindowBounds', settings.settingsWindowBounds);
         }
     }
 
@@ -103,6 +121,14 @@ export class SettingsStore {
 
     setWindowBounds(bounds: WindowBounds): void {
         this.store.set('windowBounds', bounds);
+    }
+
+    getSettingsWindowBounds(): WindowBounds {
+        return this.store.get('settingsWindowBounds', defaultSettings.settingsWindowBounds!);
+    }
+
+    setSettingsWindowBounds(bounds: WindowBounds): void {
+        this.store.set('settingsWindowBounds', bounds);
     }
 }
 

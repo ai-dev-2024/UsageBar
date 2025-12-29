@@ -32,4 +32,13 @@ contextBridge.exposeInMainWorld('usagebar', {
 
     // Notifications
     showNotification: (title: string, body: string) => ipcRenderer.send('show-notification', title, body),
+
+    // Update notifications and actions
+    onUpdateAvailable: (callback: (version: string) => void) => ipcRenderer.on('update-available', (_, version) => callback(version)),
+    onUpdateDownloadProgress: (callback: (percent: number) => void) => ipcRenderer.on('update-download-progress', (_, percent) => callback(percent)),
+    onUpdateDownloaded: (callback: (version: string) => void) => ipcRenderer.on('update-downloaded', (_, version) => callback(version)),
+    onUpdateError: (callback: (error: string) => void) => ipcRenderer.on('update-error', (_, error) => callback(error)),
+    downloadUpdate: () => ipcRenderer.send('download-update'),
+    installUpdate: () => ipcRenderer.send('install-update'),
+    resetAllUsage: () => ipcRenderer.send('reset-all-usage'),
 });

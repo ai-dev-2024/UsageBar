@@ -6,45 +6,80 @@
   <title>UsageBar Settings</title>
   <style>
     :root {
-      --bg-color: #ffffff;
-      --sidebar-bg: #f9f9fa;
-      --card-bg: #ffffff;
-      --text-primary: #09090b;
-      --text-secondary: #71717a;
-      --accent: #18181b;
-      /* Zinc 950 */
-      --accent-foreground: #ffffff;
-      --border: #e4e4e7;
-      --input-bg: #ffffff;
-      --input-border: #e4e4e7;
-      --ring: #18181b;
-      --danger: #ef4444;
-      --font-family: "Geist", "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      /* Gradient Glassmorphism Theme (Typography Showcase Style) */
+      --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #a1a1aa 100%);
+      --sidebar-bg: rgba(255, 255, 255, 0.12);
+      /* Glass Sidebar */
+      --main-bg: rgba(255, 255, 255, 0.08);
+      /* Frosted glass card */
+      --card-bg: rgba(255, 255, 255, 0.1);
+      --text-primary: #ffffff;
+      --text-secondary: rgba(255, 255, 255, 0.7);
+      --accent: #ffffff;
+      --accent-foreground: #667eea;
+      --border: rgba(255, 255, 255, 0.15);
+      --sidebar-border: rgba(255, 255, 255, 0.2);
+      --input-bg: rgba(255, 255, 255, 0.1);
+      --input-border: rgba(255, 255, 255, 0.2);
+      --ring: #ffffff;
+      --selection-bg: rgba(255, 255, 255, 0.15);
+      --font-serif: "Georgia", "Cambria", "Times New Roman", serif;
+      --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --danger: #f87171;
+    }
+
+    [data-theme="dark"] {
+      --bg-gradient: linear-gradient(135deg, #3b4371 0%, #5c64a0 50%, #8892b0 100%);
+      --sidebar-bg: rgba(0, 0, 0, 0.25);
+      --main-bg: rgba(0, 0, 0, 0.15);
+      --card-bg: rgba(255, 255, 255, 0.06);
+      --text-primary: #f9fafb;
+      --text-secondary: rgba(255, 255, 255, 0.6);
+      --accent: #ffffff;
+      --accent-foreground: #1f2937;
+      --border: rgba(255, 255, 255, 0.1);
+      --sidebar-border: rgba(255, 255, 255, 0.08);
+      --input-bg: rgba(255, 255, 255, 0.08);
+      --input-border: rgba(255, 255, 255, 0.1);
+      --selection-bg: rgba(255, 255, 255, 0.1);
+      --ring: #ffffff;
+    }
+
+    html {
+      background: var(--bg-gradient);
+      background-attachment: fixed;
     }
 
     body {
-      font-family: var(--font-family);
+      font-family: var(--font-sans);
       margin: 0;
       padding: 0;
       height: 100vh;
       display: flex;
-      background: var(--bg-color);
+      background: transparent;
       color: var(--text-primary);
       overflow: hidden;
       font-size: 14px;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* Sidebar */
+    /* Sidebar - Frosted Glass Card */
     .sidebar {
       width: 240px;
       background: var(--sidebar-bg);
-      border-right: 1px solid var(--border);
+      backdrop-filter: blur(25px);
+      -webkit-backdrop-filter: blur(25px);
+      border: 1px solid var(--sidebar-border);
       display: flex;
       flex-direction: column;
-      padding: 24px 12px;
+      padding: 24px 16px;
+      border-radius: 24px;
+      /* Match main content */
+      margin: 16px 0 16px 16px;
+      /* Float the sidebar */
     }
 
+    /* ... (Logic for sidebar items remains, just ensuring backgrounds match) ... */
     .sidebar-title {
       font-size: 11px;
       font-weight: 600;
@@ -55,27 +90,29 @@
     }
 
     .nav-item {
-      padding: 8px 12px;
+      padding: 10px 12px;
       display: flex;
       align-items: center;
       gap: 12px;
       cursor: pointer;
-      border-radius: 6px;
+      border-radius: 8px;
+      /* Rounded pill */
       transition: all 0.2s;
       font-size: 14px;
       font-weight: 500;
       color: var(--text-secondary);
-      margin-bottom: 2px;
+      margin-bottom: 4px;
     }
 
     .nav-item:hover {
-      background: rgba(0, 0, 0, 0.04);
+      background: var(--selection-bg);
       color: var(--text-primary);
     }
 
     .nav-item.active {
-      background: #e4e4e7;
+      background: var(--selection-bg);
       color: var(--text-primary);
+      font-weight: 600;
     }
 
     .nav-icon {
@@ -93,18 +130,30 @@
       height: 16px;
     }
 
-    /* Main Content */
+    /* Main Content - Frosted Glass Card */
     .main {
       flex: 1;
-      padding: 40px 48px;
+      background: var(--main-bg);
+      backdrop-filter: blur(30px);
+      -webkit-backdrop-filter: blur(30px);
+      padding: 40px 60px;
       overflow-y: auto;
       display: flex;
       flex-direction: column;
-      max-width: 800px;
+      max-width: 100%;
+
+      /* Frosted glass card styling */
+      border-radius: 24px;
+      margin: 16px;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+      position: relative;
     }
 
+
+
     .header {
-      margin-bottom: 32px;
+      margin-bottom: 40px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -112,9 +161,41 @@
     }
 
     .page-title {
-      font-size: 24px;
+      font-size: 28px;
       font-weight: 600;
-      letter-spacing: -0.02em;
+      letter-spacing: -0.03em;
+    }
+
+    /* Flow-style Feature Card */
+    .feature-card {
+      background: var(--card-bg);
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 32px;
+      border: 1px solid transparent;
+    }
+
+    .feature-card-title {
+      font-family: var(--font-serif);
+      font-size: 24px;
+      margin-bottom: 8px;
+      color: var(--text-primary);
+      font-weight: 400;
+      font-style: italic;
+    }
+
+    .feature-card-title em,
+    .feature-card-title i {
+      font-style: italic;
+      /* Ensure italic effect like screenshot */
+    }
+
+    .feature-card-desc {
+      color: var(--text-secondary);
+      font-size: 14px;
+      line-height: 1.6;
+      margin-bottom: 24px;
+      max-width: 80%;
     }
 
     /* Components */
@@ -122,14 +203,15 @@
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      border-radius: 6px;
+      border-radius: 8px;
       font-size: 14px;
       font-weight: 500;
-      height: 36px;
-      padding: 0 16px;
+      height: 40px;
+      padding: 0 20px;
       cursor: pointer;
       transition: all 0.2s;
       border: 1px solid transparent;
+      box-shadow: none;
       outline: none;
     }
 
@@ -139,7 +221,8 @@
     }
 
     .btn-primary:hover {
-      opacity: 0.9;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .btn-danger {
@@ -205,11 +288,12 @@
       border-bottom: none;
     }
 
+    /* Toggles - cleaner */
     .switch {
       position: relative;
       display: inline-block;
-      width: 36px;
-      height: 20px;
+      width: 40px;
+      height: 22px;
     }
 
     .switch input {
@@ -225,7 +309,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: #e4e4e7;
+      background-color: var(--input-border);
       transition: .2s;
       border-radius: 20px;
     }
@@ -233,8 +317,8 @@
     .slider:before {
       position: absolute;
       content: "";
-      height: 16px;
-      width: 16px;
+      height: 18px;
+      width: 18px;
       left: 2px;
       bottom: 2px;
       background-color: white;
@@ -248,7 +332,7 @@
     }
 
     input:checked+.slider:before {
-      transform: translateX(16px);
+      transform: translateX(18px);
     }
 
     .toggle-label {
@@ -256,37 +340,254 @@
       font-weight: 500;
     }
 
-    /* Provider Colors */
-    .bg-antigravity {
+    /* Custom Theme Toggle (Sun/Moon) */
+    .theme-switch-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .theme-switch {
+      position: relative;
+      display: inline-block;
+      width: 56px;
+      height: 28px;
+    }
+
+    .theme-switch input {
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .theme-slider {
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #f4f4f5;
+      /* Light bg */
+      transition: .4s;
+      border-radius: 34px;
+      border: 1px solid #e4e4e7;
+    }
+
+    .theme-slider:before {
+      position: absolute;
+      content: "";
+      height: 22px;
+      width: 22px;
+      left: 3px;
+      bottom: 2px;
+      background-color: #ffffff;
+      transition: .4s;
+      border-radius: 50%;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      z-index: 2;
+    }
+
+    /* Icons inside slider */
+    .icon-sun,
+    .icon-moon {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      font-size: 14px;
+      transition: opacity 0.3s;
+    }
+
+    .icon-sun {
+      left: 7px;
+      opacity: 0;
+      /* Hidden by default (in light mode state if unchecked usually means dark?) */
+      /* Wait, logic: Unchecked = Light Mode? Checked = Dark Mode? */
+    }
+
+    .icon-moon {
+      right: 7px;
+      opacity: 0;
+    }
+
+    /* Checked State (Dark Mode) */
+    input:checked+.theme-slider {
+      background-color: #000000;
+      border-color: #000000;
+    }
+
+    input:checked+.theme-slider:before {
+      transform: translateX(28px);
+      background-color: #ffffff;
+    }
+
+    /* Provider Colors (Restored) */
+    .bg-antigravity,
+    .bg-cursor,
+    .bg-claude,
+    .bg-copilot,
+    .bg-gemini,
+    .bg-factory,
+    .bg-zai {
       background: transparent;
     }
 
-    .bg-cursor {
-      background: #000000;
-    }
-
-    .bg-claude {
-      background: #d97757;
-    }
-
     .bg-codex {
-      background: #10a37f;
+      background: #ffffff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .bg-copilot {
-      background: #000000;
+    /* Logic:
+       Unchecked (Light Mode): Slider is light. Knob is left (White).
+       We want Sun visible on LEFT? No, if knob is left, it covers left.
+       The image shows: 
+       State 1: Dark Pill. Knob Left (White). Moon on Right. 
+       State 2: Light Pill. Knob Right (Black). Sun on Left.
+    */
+
+    /* Let's try matching the image exactly:
+       Checkbox Checked = Dark Mode.
+       checked + slider -> bg black. 
+    */
+
+    /* Image State 1 (Left Image): Black Pill, White Knob Left, Moon Right.
+       This implies "Dark Mode Active" but knob is Left? 
+       Or maybe that's "Night Mode OFF"? 
+       Usually Toggle Right = Active. 
+       
+       Let's stick to standard:
+       Unchecked = Light Mode. Light Pill. Knob Left. Moon visible on right? Or Sun on right?
+       Checked = Dark Mode. Dark Pill. Knob Right. Sun visible on left?
+    */
+
+    /* Re-reading user image logic: 
+       "Light Pill, Sun Left, Black Knob Right" -> This looks like "Light Mode" implementation?
+       "Black Pill, White Knob Left, Moon Right" -> This looks like "Dark Mode" implementation?
+    */
+
+    /* I will implement standard toggle behavior but style to match looks:
+       Light Mode (Default): Light Pill. Knob Left (White). Moon Icon on Right (indicating "Click for Dark").
+       Dark Mode (Checked): Black Pill. Knob Right (White). Sun Icon on Left (indicating "Click for Light").
+    */
+
+    .theme-slider .icon-indicator {
+      position: absolute;
+      top: 5px;
+      font-size: 14px;
+      line-height: 1;
+      transition: opacity 0.3s;
     }
 
-    .bg-gemini {
-      background: linear-gradient(135deg, #4285f4, #ea4335);
+    .theme-slider .sun {
+      left: 8px;
+      color: #fbbf24;
+      opacity: 0;
     }
 
-    .bg-factory {
-      background: #f59e0b;
+    .theme-slider .moon {
+      right: 8px;
+      color: #71717a;
+      opacity: 1;
     }
 
-    .bg-zai {
-      background: #ec4899;
+    input:checked+.theme-slider .sun {
+      opacity: 1;
+    }
+
+    input:checked+.theme-slider .moon {
+      opacity: 0;
+    }
+
+    input:checked+.theme-slider {
+      background-color: #18181b;
+    }
+
+    input:checked+.theme-slider:before {
+      transform: translateX(28px);
+      background-color: #000000;
+      /* Dark knob? or White? Image shows White knob on Left, Black knob on Right. */
+      /* I'll use White knob for simplicity and contrast */
+      background-color: #ffffff;
+    }
+
+
+    /* Dark Mode Icon Fixes */
+    [data-theme="dark"] .bg-cursor img,
+    [data-theme="dark"] .bg-copilot svg path,
+    [data-theme="dark"] .bg-antigravity img {
+      filter: invert(1);
+    }
+
+
+
+    /* Polished Components (shadcn-like) */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      height: 36px;
+      padding: 0 16px;
+      cursor: pointer;
+      transition: all 0.2s;
+      border: 1px solid var(--border);
+      background: var(--card-bg);
+      color: var(--text-primary);
+      outline: none;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    }
+
+    .btn:hover {
+      background: var(--input-bg);
+      border-color: var(--ring);
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: var(--accent-foreground);
+      border-color: var(--accent);
+    }
+
+    .btn-primary:hover {
+      opacity: 0.9;
+      background: var(--accent);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border-color: var(--border);
+    }
+
+    .btn-danger:hover {
+      background: rgba(239, 68, 68, 0.1);
+      border-color: var(--danger);
+    }
+
+    .sidebar-footer {
+      padding: 16px;
+      border-top: 1px solid var(--border);
+      margin-top: auto;
+    }
+
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      height: 32px;
+      border-radius: 6px;
+      background: var(--input-bg);
+      border: 1px solid var(--border);
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+      gap: 8px;
     }
   </style>
 </head>
@@ -295,7 +596,7 @@
   <div class="sidebar">
     <div class="sidebar-title">Providers</div>
     <div id="nav-list"></div>
-    <div style="flex:1"></div>
+    <div style="margin-top:24px;"></div>
     <div class="sidebar-title">General</div>
     <div class="nav-item" id="nav-general">
       <div class="nav-icon" style="background:#71717a"><svg fill="#fff" viewBox="0 0 24 24">
@@ -321,13 +622,13 @@
     // Exact same SVGs as tray.html
     const svgs = {
       antigravity: '<img src="antigravity.png" style="width:20px;height:20px;object-fit:contain;">',
-      cursor: '<svg fill="#fff" viewBox="0 0 24 24"><path d="M11.503.131 1.891 5.678a.84.84 0 0 0-.42.726v11.188c0 .3.162.575.42.724l9.609 5.55a1 1 0 0 0 .998 0l9.61-5.55a.84.84 0 0 0 .42-.724V6.404a.84.84 0 0 0-.42-.726L12.497.131a1.01 1.01 0 0 0-.996 0M2.657 6.338h18.55c.263 0 .43.287.297.515L12.23 22.918c-.062.107-.229.064-.229-.06V12.335a.59.59 0 0 0-.295-.51l-9.11-5.257c-.109-.063-.064-.23.061-.23"/></svg>',
-      claude: '<svg fill="#fff" viewBox="0 0 16 16"><path d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212"/></svg>',
-      codex: '<svg fill="#fff" viewBox="0 0 24 24"><path d="M22.2819 9.8211a5.9847 5.9847 0 0 0-.5157-4.9108 6.0462 6.0462 0 0 0-6.5098-2.9A6.0651 6.0651 0 0 0 4.9807 4.1818a5.9847 5.9847 0 0 0-3.9977 2.9 6.0462 6.0462 0 0 0 .7427 7.0966 5.98 5.98 0 0 0 .511 4.9107 6.051 6.051 0 0 0 6.5146 2.9001A5.9847 5.9847 0 0 0 13.2599 24a6.0557 6.0557 0 0 0 5.7718-4.2058 5.9894 5.9894 0 0 0 3.9977-2.9001 6.0557 6.0557 0 0 0-.7475-7.0729zm-9.022 12.6081a4.4755 4.4755 0 0 1-2.8764-1.0408l.1419-.0843 3.5366-1.9718a3.1835 3.1835 0 0 0 1.126-4.393L13.7376 11.9l2.9536-1.6456 1.0772 1.8545a4.502 4.502 0 0 1-4.5085 7.7122zm-5.0235-.7778-3.5366-1.9718a3.1793 3.1793 0 0 0-.0079-6.3905l2.4277-.4423L8.673 13.197l2.8842 1.764L10.08 17.61a4.498 4.498 0 0 1-1.8436 4.0414zM2.48 10.9085a4.4722 4.4722 0 0 1 .6722-4.3733l2.8532 1.6376L3.9213 11.16a3.1823 3.1823 0 0 0 3.75 3.999l2.259-.8776-1.957-1.129 1.4509-2.5273L3.1019 13.918a4.4752 4.4752 0 0 1-.6219-3.0095zm4.9736-5.8338a4.4959 4.4959 0 0 1 4.1955-1.6322l-1.0763 1.856-1.4509 2.5259-.9736-.576a3.1906 3.1906 0 0 0-4.3262 1.39l-2.9536-1.647 3.5366-1.9723a4.483 4.483 0 0 1 3.0485.0556zm8.8548.3377a3.1769 3.1769 0 0 0-2.6775-3.5413l1.8329-3.1586 1.4509-2.5259 3.3789 2.062a4.4949 4.4949 0 0 1 .9153 6.0759l-3.5366 1.9718L13.7376 3.953l2.5694 1.4604zm4.5052 5.3764-2.8532-1.6376 2.0832-2.9868a3.1812 3.1812 0 0 0-3.7482-3.9976L13.847 2.7667l1.957 1.1306-1.4509 2.5273 6.3225-3.2926a4.4714 4.4714 0 0 1 .1379 2.1368z"/></svg>',
-      copilot: '<svg fill="#fff" viewBox="0 0 24 24"><path d="M23.922 16.997C23.061 18.492 18.063 22.02 12 22.02 5.937 22.02.939 18.492.078 16.997A.641.641 0 0 1 0 16.741v-2.869a.883.883 0 0 1 .053-.22c.372-.935 1.347-2.292 2.605-2.656.167-.429.414-1.055.644-1.517a10.098 10.098 0 0 1-.052-1.086c0-1.331.282-2.499 1.132-3.368.397-.406.89-.717 1.474-.952C7.255 2.937 9.248 1.98 11.978 1.98c2.731 0 4.767.957 6.166 2.093.584.235 1.077.546 1.474.952.85.869 1.132 2.037 1.132 3.368 0 .368-.014.733-.052 1.086.23.462.477 1.088.644 1.517 1.258.364 2.233 1.721 2.605 2.656a.841.841 0 0 1 .053.22v2.869a.641.641 0 0 1-.078.256Zm-11.75-5.992h-.344a4.359 4.359 0 0 1-.355.508c-.77.947-1.918 1.492-3.508 1.492-1.725 0-2.989-.359-3.782-1.259a2.137 2.137 0 0 1-.085-.104L4 11.746v6.585c1.435.779 4.514 2.179 8 2.179 3.486 0 6.565-1.4 8-2.179v-6.585l-.098-.104s-.033.045-.085.104c-.793.9-2.057 1.259-3.782 1.259-1.59 0-2.738-.545-3.508-1.492a4.359 4.359 0 0 1-.355-.508Zm2.328 3.25c.549 0 1 .451 1 1v2c0 .549-.451 1-1 1-.549 0-1-.451-1-1v-2c0-.549.451-1 1-1Zm-5 0c.549 0 1 .451 1 1v2c0 .549-.451 1-1 1-.549 0-1-.451-1-1v-2c0-.549.451-1 1-1Zm3.313-6.185c.136 1.057.403 1.913.878 2.497.442.544 1.134.938 2.344.938 1.573 0 2.292-.337 2.657-.751.384-.435.558-1.15.558-2.361 0-1.14-.243-1.847-.705-2.319-.477-.488-1.319-.862-2.824-1.025-1.487-.161-2.192.138-2.533.529-.269.307-.437.808-.438 1.578v.021c0 .265.021.562.063.893Zm-1.626 0c.042-.331.063-.628.063-.894v-.02c-.001-.77-.169-1.271-.438-1.578-.341-.391-1.046-.69-2.533-.529-1.505.163-2.347.537-2.824 1.025-.462.472-.705 1.179-.705 2.319 0 1.211.175 1.926.558 2.361.365.414 1.084.751 2.657.751 1.21 0 1.902-.394 2.344-.938.475-.584.742-1.44.878-2.497Z"/></svg>',
-      gemini: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 0 C 12 8 17 12 24 12 C 17 12 12 17 12 24 C 12 17 8 12 0 12 C 8 12 12 8 12 0 Z"/></svg>', // Official Gemini Sparkle
-      factory: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M12 2a2 2 0 0 1 2 2c0 .74-.4 1.39-1 1.73V7h6a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2h6V5.73c-.6-.34-1-.99-1-1.73a2 2 0 0 1 2-2M7.5 13A2.5 2.5 0 0 0 5 15.5A2.5 2.5 0 0 0 7.5 18A2.5 2.5 0 0 0 10 15.5A2.5 2.5 0 0 0 7.5 13M16.5 13A2.5 2.5 0 0 0 14 15.5A2.5 2.5 0 0 0 16.5 18A2.5 2.5 0 0 0 19 15.5A2.5 2.5 0 0 0 16.5 13Z"/></svg>', // Robot/Droid Head
-      zai: '<svg viewBox="0 0 24 24" fill="#fff"><path d="M4 6h16v3h-10.5l10.5 10v3h-16v-3h10.5l-10.5-10v-3z"/></svg>' // Bold Z
+      cursor: '<img src="cursor.png" style="width:20px;height:20px;object-fit:contain;">',
+      claude: '<svg fill="#d97757" viewBox="0 0 16 16"><path d="m3.127 10.604 3.135-1.76.053-.153-.053-.085H6.11l-.525-.032-1.791-.048-1.554-.065-1.505-.08-.38-.081L0 7.832l.036-.234.32-.214.455.04 1.009.069 1.513.105 1.097.064 1.626.17h.259l.036-.105-.089-.065-.068-.064-1.566-1.062-1.695-1.121-.887-.646-.48-.327-.243-.306-.104-.67.435-.48.585.04.15.04.593.456 1.267.981 1.654 1.218.242.202.097-.068.012-.049-.109-.181-.9-1.626-.96-1.655-.428-.686-.113-.411a2 2 0 0 1-.068-.484l.496-.674L4.446 0l.662.089.279.242.411.94.666 1.48 1.033 2.014.302.597.162.553.06.17h.105v-.097l.085-1.134.157-1.392.154-1.792.052-.504.25-.605.497-.327.387.186.319.456-.045.294-.19 1.23-.37 1.93-.243 1.29h.142l.161-.16.654-.868 1.097-1.372.484-.545.565-.601.363-.287h.686l.505.751-.226.775-.707.895-.585.759-.839 1.13-.524.904.048.072.125-.012 1.897-.403 1.024-.186 1.223-.21.553.258.06.263-.218.536-1.307.323-1.533.307-2.284.54-.028.02.032.04 1.029.098.44.024h1.077l2.005.15.525.346.315.424-.053.323-.807.411-3.631-.863-.872-.218h-.12v.073l.726.71 1.331 1.202 1.667 1.55.084.383-.214.302-.226-.032-1.464-1.101-.565-.497-1.28-1.077h-.084v.113l.295.432 1.557 2.34.08.718-.112.234-.404.141-.444-.08-.911-1.28-.94-1.44-.759-1.291-.093.053-.448 4.821-.21.246-.484.186-.403-.307-.214-.496.214-.98.258-1.28.21-1.016.19-1.263.112-.42-.008-.028-.092.012-.953 1.307-1.448 1.957-1.146 1.227-.274.109-.477-.247.045-.44.266-.39 1.586-2.018.956-1.25.617-.723-.004-.105h-.036l-4.212"/></svg>',
+      codex: '<img src="codex.png" style="width:20px;height:20px;object-fit:contain;">',
+      copilot: '<svg fill="#000000" viewBox="0 0 24 24"><path d="M23.922 16.997C23.061 18.492 18.063 22.02 12 22.02 5.937 22.02.939 18.492.078 16.997A.641.641 0 0 1 0 16.741v-2.869a.883.883 0 0 1 .053-.22c.372-.935 1.347-2.292 2.605-2.656.167-.429.414-1.055.644-1.517a10.098 10.098 0 0 1-.052-1.086c0-1.331.282-2.499 1.132-3.368.397-.406.89-.717 1.474-.952C7.255 2.937 9.248 1.98 11.978 1.98c2.731 0 4.767.957 6.166 2.093.584.235 1.077.546 1.474.952.85.869 1.132 2.037 1.132 3.368 0 .368-.014.733-.052 1.086.23.462.477 1.088.644 1.517 1.258.364 2.233 1.721 2.605 2.656a.841.841 0 0 1 .053.22v2.869a.641.641 0 0 1-.078.256Zm-11.75-5.992h-.344a4.359 4.359 0 0 1-.355.508c-.77.947-1.918 1.492-3.508 1.492-1.725 0-2.989-.359-3.782-1.259a2.137 2.137 0 0 1-.085-.104L4 11.746v6.585c1.435.779 4.514 2.179 8 2.179 3.486 0 6.565-1.4 8-2.179v-6.585l-.098-.104s-.033.045-.085.104c-.793.9-2.057 1.259-3.782 1.259-1.59 0-2.738-.545-3.508-1.492a4.359 4.359 0 0 1-.355-.508Zm2.328 3.25c.549 0 1 .451 1 1v2c0 .549-.451 1-1 1-.549 0-1-.451-1-1v-2c0-.549.451-1 1-1Zm-5 0c.549 0 1 .451 1 1v2c0 .549-.451 1-1 1-.549 0-1-.451-1-1v-2c0-.549.451-1 1-1Zm3.313-6.185c.136 1.057.403 1.913.878 2.497.442.544 1.134.938 2.344.938 1.573 0 2.292-.337 2.657-.751.384-.435.558-1.15.558-2.361 0-1.14-.243-1.847-.705-2.319-.477-.488-1.319-.862-2.824-1.025-1.487-.161-2.192.138-2.533.529-.269.307-.437.808-.438 1.578v.021c0 .265.021.562.063.893Zm-1.626 0c.042-.331.063-.628.063-.894v-.02c-.001-.77-.169-1.271-.438-1.578-.341-.391-1.046-.69-2.533-.529-1.505.163-2.347.537-2.824 1.025-.462.472-.705 1.179-.705 2.319 0 1.211.175 1.926.558 2.361.365.414 1.084.751 2.657.751 1.21 0 1.902-.394 2.344-.938.475-.584.742-1.44.878-2.497Z"/></svg>',
+      gemini: '<svg viewBox="0 0 24 24" fill="url(#gemini-gradient)"><defs><linearGradient id="gemini-gradient" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#4285f4;stop-opacity:1" /><stop offset="100%" style="stop-color:#ea4335;stop-opacity:1" /></linearGradient></defs><path d="M12 0 C 12 8 17 12 24 12 C 17 12 12 17 12 24 C 12 17 8 12 0 12 C 8 12 12 8 12 0 Z"/></svg>', // Official Gemini Sparkle
+      factory: '<img src="factory.png" style="width:20px;height:20px;object-fit:cover;border-radius:2px;">',
+      zai: '<img src="zai.png" style="width:20px;height:20px;object-fit:cover;border-radius:2px;">'
     };
 
     const providersMeta = {
@@ -372,47 +673,97 @@
     function renderPage() {
       const content = document.getElementById('content-area');
       const title = document.getElementById('page-title');
+      const headerMain = document.querySelector('.main > .header');
       content.innerHTML = '';
 
       if (activeNav === 'general') {
-        title.textContent = 'General Settings';
+        // Hide default header for General tab (using internal header)
+        if (headerMain) headerMain.style.display = 'none';
+
         const currentInterval = settings.refreshInterval || 5;
         content.innerHTML = `
-          <div class="form-group">
-            <label class="form-label">Refresh Interval</label>
-            <select id="gen-interval">
-              <option value="1" ${currentInterval === 1 ? 'selected' : ''}>1 minute</option>
-              <option value="2" ${currentInterval === 2 ? 'selected' : ''}>2 minutes</option>
-              <option value="5" ${currentInterval === 5 ? 'selected' : ''}>5 minutes</option>
-              <option value="10" ${currentInterval === 10 ? 'selected' : ''}>10 minutes</option>
-              <option value="15" ${currentInterval === 15 ? 'selected' : ''}>15 minutes</option>
-              <option value="30" ${currentInterval === 30 ? 'selected' : ''}>30 minutes</option>
-            </select>
-            <div class="form-hint">How often the app fetches your usage data from providers.</div>
+          <div class="header" style="margin-bottom: 40px; display: flex; justify-content: space-between; align-items: center;">
+             <div class="page-title">Welcome back</div>
+             <div id="version-badge" style="font-size:13px; color:var(--text-secondary); background:var(--selection-bg); padding:4px 10px; border-radius:12px; cursor:pointer;">v1.4.0</div>
           </div>
-          <div class="form-group">
-             <label class="toggle-row">
-               <span class="toggle-label">Reset Session Usage Daily</span>
-               <label class="switch">
-                 <input type="checkbox" id="gen-reset" ${settings.resetDaily ? 'checked' : ''}>
-                 <span class="slider"></span>
-               </label>
-             </label>
-             <div class="form-hint">Automatically resets your "Session" meter every 24 hours.</div>
+
+          <div class="feature-card">
+            <div class="feature-card-title"><em>Make UsageBar work like you</em></div>
+            <div class="feature-card-desc">
+                Customize how often we check your quotas and when your daily session tracking resets, so it fits your workflow perfectly.
+            </div>
+
+             <div class="form-group">
+                <label class="form-label">Refresh Interval</label>
+                <select id="gen-interval">
+                  <option value="1" ${currentInterval === 1 ? 'selected' : ''}>1 minute</option>
+                  <option value="2" ${currentInterval === 2 ? 'selected' : ''}>2 minutes</option>
+                  <option value="5" ${currentInterval === 5 ? 'selected' : ''}>5 minutes</option>
+                  <option value="10" ${currentInterval === 10 ? 'selected' : ''}>10 minutes</option>
+                  <option value="15" ${currentInterval === 15 ? 'selected' : ''}>15 minutes</option>
+                  <option value="30" ${currentInterval === 30 ? 'selected' : ''}>30 minutes</option>
+                </select>
+                <div class="form-hint">Frequency of usage data synchronization.</div>
+             </div>
+
+             <div class="form-group">
+                <label class="form-label">Global Hotkey</label>
+                <input type="text" class="form-input" id="gen-hotkey" value="${settings.hotkey || 'CommandOrControl+Shift+U'}" 
+                       placeholder="e.g., CommandOrControl+Shift+U" 
+                       style="background:var(--input-bg); border:1px solid var(--border); color:var(--text-primary); padding:10px 14px; border-radius:8px; width:100%; font-size:13px;">
+                <div class="form-hint">Keyboard shortcut to toggle the tray popup (e.g., Ctrl+Shift+U).</div>
+             </div>
+
+             <div class="form-group">
+                 <label class="toggle-row">
+                   <span class="toggle-label">Reset Session Daily</span>
+                   <label class="switch">
+                     <input type="checkbox" id="gen-reset" ${settings.resetDaily ? 'checked' : ''}>
+                     <span class="slider"></span>
+                   </label>
+                 </label>
+                 <div class="form-hint">Automatically clears session meter every 24 hours.</div>
+             </div>
           </div>
-          <div class="header" style="margin-top:40px; margin-bottom:10px;">
-             <div class="page-title" style="font-size:18px">Reset Data</div>
+
+          <div style="margin-top:40px; margin-bottom:20px;">
+             <div style="font-size:18px; font-weight:600; margin-bottom:10px;">Support Development</div>
+             <div class="feature-card" style="background:transparent; border:1px solid var(--border); padding:24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:500">☕ Buy Me a Coffee</div>
+                        <div class="form-hint">If you enjoy UsageBar, consider supporting its development!</div>
+                    </div>
+                    <button class="btn" id="btn-kofi" style="background:#FF5E5B; border:none; color:white;">Support on Ko-fi</button>
+                </div>
+             </div>
           </div>
-          <div class="form-group">
-            <button class="btn btn-danger" id="btn-reset-all">Reset All Usage Data</button>
-            <div class="form-hint">Clears all stored usage history for all providers.</div>
+
+          <div style="margin-top:40px; margin-bottom:20px;">
+             <div style="font-size:18px; font-weight:600; margin-bottom:10px;">Data & Privacy</div>
+             <div class="feature-card" style="background:transparent; border:1px solid var(--border); padding:24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center;">
+                    <div>
+                        <div style="font-weight:500">Reset All Data</div>
+                        <div class="form-hint">Clear all stored usage history and local caches.</div>
+                    </div>
+                    <button class="btn btn-danger" id="btn-reset-all">Reset Data</button>
+                </div>
+             </div>
           </div>
         `;
         document.getElementById('gen-interval').onchange = (e) => {
           settings.refreshInterval = parseInt(e.target.value, 10);
           ipc.saveSettings(settings);
         };
+        document.getElementById('gen-hotkey').onchange = (e) => {
+          settings.hotkey = e.target.value;
+          ipc.saveSettings(settings);
+        };
         document.getElementById('gen-reset').onchange = (e) => settings.resetDaily = e.target.checked;
+        document.getElementById('btn-kofi').onclick = () => {
+          ipc.openUrl('https://ko-fi.com/ai_dev_2024');
+        };
         document.getElementById('btn-reset-all').onclick = () => {
           if (confirm('Are you sure you want to reset all usage data?')) {
             ipc.resetAllUsage();
@@ -498,12 +849,100 @@
       alert('Settings saved!');
     };
 
+    // Theme Logic
+    function applyTheme(theme) {
+      if (!theme || theme === 'system') theme = 'light';
+      document.documentElement.setAttribute('data-theme', theme);
+
+      const input = document.getElementById('theme-toggle-input');
+      if (input) {
+        input.checked = (theme === 'dark');
+      }
+    }
+
+    const themeInput = document.getElementById('theme-toggle-input');
+    if (themeInput) {
+      themeInput.onchange = (e) => {
+        const next = e.target.checked ? 'dark' : 'light';
+        settings.theme = next;
+        applyTheme(next);
+        ipc.saveSettings(settings);
+      };
+    }
+
     // Load initial settings
     ipc.getSettings().then(s => {
       settings = s || {};
       renderNav();
       renderPage();
+      applyTheme(settings.theme);
     });
+
+    // Listen for update availability
+    let updateVersion = null;
+    let isDownloading = false;
+    let isDownloaded = false;
+
+    if (ipc.onUpdateAvailable) {
+      ipc.onUpdateAvailable((version) => {
+        updateVersion = version;
+        const badge = document.getElementById('version-badge');
+        if (badge) {
+          badge.textContent = '🔄 Update Available';
+          badge.style.background = '#14b8a6';
+          badge.style.color = '#ffffff';
+          badge.style.cursor = 'pointer';
+          badge.title = `Click to download v${version}`;
+          badge.onclick = () => {
+            if (isDownloaded) {
+              ipc.installUpdate();
+            } else if (!isDownloading && ipc.downloadUpdate) {
+              isDownloading = true;
+              badge.textContent = '⏳ Downloading...';
+              badge.style.background = '#f59e0b';
+              ipc.downloadUpdate();
+            }
+          };
+        }
+      });
+    }
+
+    // Download progress
+    if (ipc.onUpdateDownloadProgress) {
+      ipc.onUpdateDownloadProgress((percent) => {
+        const badge = document.getElementById('version-badge');
+        if (badge && isDownloading) {
+          badge.textContent = `⬇️ ${percent.toFixed(0)}%`;
+        }
+      });
+    }
+
+    // Download complete
+    if (ipc.onUpdateDownloaded) {
+      ipc.onUpdateDownloaded((version) => {
+        isDownloading = false;
+        isDownloaded = true;
+        const badge = document.getElementById('version-badge');
+        if (badge) {
+          badge.textContent = '✅ Install Update';
+          badge.style.background = '#22c55e';
+          badge.title = `Click to install v${version}`;
+        }
+      });
+    }
+
+    // Update error
+    if (ipc.onUpdateError) {
+      ipc.onUpdateError((error) => {
+        isDownloading = false;
+        const badge = document.getElementById('version-badge');
+        if (badge) {
+          badge.textContent = '❌ Update Failed';
+          badge.style.background = '#ef4444';
+          badge.title = error;
+        }
+      });
+    }
   </script>
 </body>
 

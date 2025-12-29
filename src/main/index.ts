@@ -22,8 +22,28 @@ let providerManager: ProviderManager;
 let refreshInterval: NodeJS.Timeout | null = null;
 let selectedProviderId: string | null = null;
 
+// Helper function to register global hotkey
+function registerHotkey(hotkey: string): void {
+    globalShortcut.unregisterAll();
+    try {
+        globalShortcut.register(hotkey, () => {
+            toggleTrayWindow();
+        });
+        console.log(`Hotkey registered: ${hotkey}`);
+    } catch (error) {
+        console.error(`Failed to register hotkey: ${hotkey}`, error);
+        // Fallback to default if registration fails
+        globalShortcut.register('CommandOrControl+Shift+U', () => {
+            toggleTrayWindow();
+        });
+    }
+}
+
 // Hide from taskbar - this is a tray-only app
 app.on('ready', async () => {
+    // Remove default application menu (File, Edit, etc.) immediately
+    Menu.setApplicationMenu(null);
+
     settings = new SettingsStore();
     providerManager = new ProviderManager(settings);
 
@@ -43,10 +63,8 @@ app.on('ready', async () => {
     const { setupAutoUpdater } = require('./updater');
     setupAutoUpdater();
 
-    // Register global hotkey (Ctrl+Shift+U to toggle tray)
-    globalShortcut.register('CommandOrControl+Shift+U', () => {
-        toggleTrayWindow();
-    });
+    // Register global hotkey from settings
+    registerHotkey(settings.getAll().hotkey);
 
     // Configure auto-start
     app.setLoginItemSettings({
@@ -54,7 +72,7 @@ app.on('ready', async () => {
         path: app.getPath('exe'),
     });
 
-    console.log('UsageBar started (Hotkey: Ctrl+Shift+U, Auto-update: enabled)');
+    console.log(`UsageBar started (Hotkey: ${settings.getAll().hotkey}, Auto-update: enabled)`);
 });
 
 let trayWindow: BrowserWindow | null = null;
@@ -76,6 +94,9 @@ function createTrayWindow() {
         resizable: true,
         skipTaskbar: true,
         alwaysOnTop: true,
+        transparent: true,
+        vibrancy: 'under-window', // macOS vibrancy
+        backgroundMaterial: 'auto', // Windows Mica/Acrylic (auto-selects best)
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -304,13 +325,20 @@ function openSettings(): void {
         return;
     }
 
+    const savedBounds = settings.getSettingsWindowBounds();
+
     settingsWindow = new BrowserWindow({
-        width: 500,
-        height: 600,
-        resizable: false,
-        minimizable: false,
-        maximizable: false,
-        title: 'UsageBar Settings',
+        width: savedBounds.width,
+        height: savedBounds.height,
+        x: savedBounds.x,
+        y: savedBounds.y,
+        minWidth: 500,
+        minHeight: 400,
+        resizable: true,
+        minimizable: true,
+        maximizable: true,
+        transparent: true,
+        backgroundMaterial: 'acrylic',
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
@@ -319,10 +347,33 @@ function openSettings(): void {
         icon: path.join(__dirname, '../../assets/icon.png'),
     });
 
+    // Save window state
+    const saveBounds = () => {
+        if (settingsWindow && !settingsWindow.isDestroyed()) {
+            const bounds = settingsWindow.getBounds();
+            settings.setSettingsWindowBounds({
+                width: bounds.width,
+                height: bounds.height,
+                x: bounds.x,
+                y: bounds.y
+            });
+        }
+    };
+
+    settingsWindow.on('resize', saveBounds);
+    settingsWindow.on('move', saveBounds);
+
+    settingsWindow.setMenuBarVisibility(false);
+    settingsWindow.setMenu(null);
+    settingsWindow.removeMenu(); // Double ensure removal on Windows
+
     // Use the correct path relative to dist folder
     const htmlPath = path.join(__dirname, '..', 'renderer', 'settings.html');
     console.log('[Settings] Loading HTML from:', htmlPath);
     settingsWindow.loadFile(htmlPath);
+
+    // Apply taskbar overlay immediately
+    updateTrayIcon();
 
     settingsWindow.on('closed', () => {
         settingsWindow = null;
@@ -335,8 +386,14 @@ function setupIPC(): void {
     });
 
     ipcMain.handle('save-settings', (_, newSettings) => {
+        const oldHotkey = settings.getAll().hotkey;
         settings.setAll(newSettings);
         startRefreshLoop(); // Restart with new interval
+
+        // Re-register hotkey if it changed
+        if (newSettings.hotkey && newSettings.hotkey !== oldHotkey) {
+            registerHotkey(newSettings.hotkey);
+        }
 
         // Immediately notify tray window of enabled providers change
         if (trayWindow && !trayWindow.isDestroyed()) {
@@ -411,6 +468,17 @@ function setupIPC(): void {
             });
             notification.show();
         }
+    });
+
+    // Update handlers - import dynamically to avoid circular deps
+    ipcMain.on('download-update', () => {
+        const { downloadUpdate } = require('./updater');
+        downloadUpdate();
+    });
+
+    ipcMain.on('install-update', () => {
+        const { installUpdate } = require('./updater');
+        installUpdate();
     });
 
     // Cursor login flow
