@@ -9,6 +9,7 @@
 <p align="center">
   <img src="https://img.shields.io/badge/Platform-Windows-0078D6?style=for-the-badge&logo=windows" alt="Windows">
   <img src="https://img.shields.io/badge/Built%20with-Antigravity-667eea?style=for-the-badge" alt="Built with Antigravity">
+  <a href="https://ko-fi.com/ai_dev_2024"><img src="https://img.shields.io/badge/☕_Ko--fi-Support-FF5E5B?style=for-the-badge" alt="Ko-fi"></a>
   <img src="https://img.shields.io/github/v/release/ai-dev-2024/UsageBar?style=for-the-badge&color=14b8a6" alt="Release">
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
 </p>
@@ -75,7 +76,7 @@
 
 ### Windows (Portable) - Recommended
 
-> **Latest Version**: [v1.4.1](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.4.1) – Toggle fix, Ko-fi sidebar
+> **Latest Version**: [v1.4.1](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.4.1) – Glassmorphism UI, transparency slider, click-to-update
 
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
 2. Download `UsageBar-v1.4.1-Portable.zip`.
