@@ -385,6 +385,52 @@
         let activeProviderId = null;
         let lastUsageData = {};
         let enabledProviders = [];
+        let notifiedProviders = {}; // Track which providers we've notified about
+
+        // Format countdown: "Resets in 2h 15m" or "Resets in 45m"
+        function formatCountdown(resetDate) {
+            if (!resetDate) return '';
+            const now = new Date();
+            const reset = new Date(resetDate);
+            const diffMs = reset - now;
+
+            if (diffMs <= 0) return 'Resetting soon';
+
+            const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+            const diffMins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+
+            if (diffHours > 24) {
+                const days = Math.floor(diffHours / 24);
+                return `Resets in ${days}d ${diffHours % 24}h`;
+            } else if (diffHours > 0) {
+                return `Resets in ${diffHours}h ${diffMins}m`;
+            } else {
+                return `Resets in ${diffMins}m`;
+            }
+        }
+
+        // Check and send quota alert notification
+        function checkQuotaAlert(providerId, data) {
+            if (!data.primary) return;
+            const usedPercent = data.primary.usedPercent;
+            const providerName = providersMeta[providerId]?.name || providerId;
+
+            // Alert at 80% usage (only once per session)
+            if (usedPercent >= 80 && !notifiedProviders[providerId]) {
+                notifiedProviders[providerId] = true;
+                if (ipc.showNotification) {
+                    ipc.showNotification(
+                        `${providerName} Quota Alert`,
+                        `You've used ${usedPercent.toFixed(0)}% of your quota. ${100 - usedPercent.toFixed(0)}% remaining.`
+                    );
+                }
+            }
+            // Reset notification flag if usage drops below 70%
+            if (usedPercent < 70) {
+                notifiedProviders[providerId] = false;
+            }
+        }
+
 
         function renderTabs(usage) {
             // Only show tabs for providers that are BOTH enabled AND have data
@@ -500,12 +546,15 @@
                 els.status.textContent = 'Updated just now';
                 els.status.style.color = 'var(--text-secondary)';
 
+                // Check for quota alerts
+                checkQuotaAlert(activeProviderId, data);
+
                 if (data.primary) {
                     const left = Math.max(0, 100 - data.primary.usedPercent);
                     els.sFill.style.width = `${left}%`;
                     els.sText.textContent = `${left.toFixed(0)}% available`;
                     els.sFill.style.backgroundColor = left > 20 ? '#5FBFA0' : '#ef4444';
-                    els.sReset.textContent = data.primary.resetsAt ? `Resets ${new Date(data.primary.resetsAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}` : '';
+                    els.sReset.textContent = formatCountdown(data.primary.resetsAt);
                 }
 
                 if (data.secondary) {
@@ -513,7 +562,7 @@
                     const left = Math.max(0, 100 - data.secondary.usedPercent);
                     els.wFill.style.width = `${left}%`;
                     els.wText.textContent = `${left.toFixed(0)}% available`;
-                    els.wReset.textContent = data.secondary.resetsAt ? `Resets ${new Date(data.secondary.resetsAt).toLocaleDateString([], { month: 'short', day: 'numeric' })}` : '';
+                    els.wReset.textContent = formatCountdown(data.secondary.resetsAt);
                 } else {
                     els.wGroup.style.display = 'none';
                 }

@@ -58,7 +58,7 @@
 
 ### Windows (Portable) - Recommended
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
-2. Download `UsageBar-v1.0.2-Portable.zip`.
+2. Download `UsageBar-v1.0.3-Portable.zip`.
 3. Extract the ZIP file to a folder of your choice (e.g., `Documents\UsageBar`).
 4. Open the folder and double-click **`UsageBar.exe`** to run.
 5. *(Optional)* Right-click `UsageBar.exe` → "Send to" → "Desktop (create shortcut)" for easy access.

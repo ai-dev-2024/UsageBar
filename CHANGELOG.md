@@ -1,5 +1,22 @@
 # UsageBar Changelog
 
+All notable changes to this project will be documented in this file.
+
+The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
+and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
+
+## [1.0.3] - 2024-12-29
+
+### Added
+- **Reset countdown timers**: Shows "Resets in 2h 15m" instead of just date/time
+- **Quota alert notifications**: Windows toast notification when usage exceeds 80%
+- GitHub Actions CI for automated build verification
+
+### Changed
+- Improved reset time display with human-readable countdown format
+
+---
+
 ## [1.0.2] - 2024-12-29
 
 ### Added

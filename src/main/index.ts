@@ -356,6 +356,20 @@ function setupIPC(): void {
         shell.openExternal(url);
     });
 
+    // Windows Toast Notification for quota alerts
+    ipcMain.on('show-notification', (_, title, body) => {
+        const { Notification } = require('electron');
+        if (Notification.isSupported()) {
+            const notification = new Notification({
+                title: title,
+                body: body,
+                icon: path.join(__dirname, '../../assets/icon.png'),
+                silent: false
+            });
+            notification.show();
+        }
+    });
+
     // Cursor login flow
     ipcMain.handle('cursor-login', async () => {
         const cursorProvider = providerManager.getCursorProvider();

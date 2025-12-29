@@ -29,4 +29,7 @@ contextBridge.exposeInMainWorld('usagebar', {
     copilotLogin: () => ipcRenderer.invoke('copilot-login'),
     copilotLogout: () => ipcRenderer.invoke('copilot-logout'),
     providerLogin: (providerId: string) => ipcRenderer.invoke('provider-login', providerId),
+
+    // Notifications
+    showNotification: (title: string, body: string) => ipcRenderer.send('show-notification', title, body),
 });
