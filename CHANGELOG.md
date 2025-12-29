@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0] - 2024-12-29
+
+### Added
+- **Settings persistence**: Window size is saved and restored on launch
+- **Dark/Light mode**: Automatic detection via system preference
+- **Theme CSS variables**: Supports `data-theme="dark"` or `data-theme="light"`
+
+### Changed
+- Window bounds save on resize for better UX
+- Improved theme handling with fallback to system preference
+
+---
+
 ## [1.2.0] - 2024-12-29
 
 ### Added

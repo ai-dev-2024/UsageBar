@@ -56,9 +56,12 @@ app.on('ready', async () => {
 let trayWindow: BrowserWindow | null = null;
 
 function createTrayWindow() {
+    // Restore saved window bounds
+    const savedBounds = settings.getWindowBounds();
+
     trayWindow = new BrowserWindow({
-        width: 340,
-        height: 480,
+        width: savedBounds.width,
+        height: savedBounds.height,
         minWidth: 300,
         minHeight: 350,
         maxWidth: 500,
@@ -80,6 +83,19 @@ function createTrayWindow() {
     // Load the tray HTML
     const trayPath = path.join(__dirname, '..', 'renderer', 'tray.html');
     trayWindow.loadFile(trayPath);
+
+    // Save window bounds on resize
+    trayWindow.on('resize', () => {
+        if (trayWindow && !trayWindow.isDestroyed()) {
+            const bounds = trayWindow.getBounds();
+            settings.setWindowBounds({
+                width: bounds.width,
+                height: bounds.height,
+                x: bounds.x,
+                y: bounds.y
+            });
+        }
+    });
 
     // Hide on blur (clicking outside)
     trayWindow.on('blur', () => {

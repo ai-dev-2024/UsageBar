@@ -4,11 +4,19 @@
 
 import Store from 'electron-store';
 
+export interface WindowBounds {
+    x?: number;
+    y?: number;
+    width: number;
+    height: number;
+}
+
 export interface AppSettings {
     enabledProviders: string[];
     refreshInterval: number; // in minutes
     autoStart: boolean;
     theme: 'light' | 'dark' | 'system';
+    windowBounds?: WindowBounds;
 }
 
 const defaultSettings: AppSettings = {
@@ -16,6 +24,7 @@ const defaultSettings: AppSettings = {
     refreshInterval: 5,
     autoStart: false,
     theme: 'system',
+    windowBounds: { width: 340, height: 480 },
 };
 
 export class SettingsStore {
@@ -34,6 +43,7 @@ export class SettingsStore {
             refreshInterval: this.store.get('refreshInterval', defaultSettings.refreshInterval),
             autoStart: this.store.get('autoStart', defaultSettings.autoStart),
             theme: this.store.get('theme', defaultSettings.theme),
+            windowBounds: this.store.get('windowBounds') || defaultSettings.windowBounds!,
         };
     }
 
@@ -49,6 +59,9 @@ export class SettingsStore {
         }
         if (settings.theme !== undefined) {
             this.store.set('theme', settings.theme);
+        }
+        if (settings.windowBounds !== undefined) {
+            this.store.set('windowBounds', settings.windowBounds);
         }
     }
 
@@ -83,4 +96,13 @@ export class SettingsStore {
     setTheme(theme: 'light' | 'dark' | 'system'): void {
         this.store.set('theme', theme);
     }
+
+    getWindowBounds(): WindowBounds {
+        return this.store.get('windowBounds', defaultSettings.windowBounds!);
+    }
+
+    setWindowBounds(bounds: WindowBounds): void {
+        this.store.set('windowBounds', bounds);
+    }
 }
+
