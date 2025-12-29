@@ -60,6 +60,10 @@
 ## 📥 Installation
 
 ### Windows (Portable) - Recommended
+
+> **Stable Version**: [v1.0.2](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.0.2) is the tested, stable release.
+> **Latest Version**: v1.2.0 has new features but is marked as pre-release for testing.
+
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
 2. Download `UsageBar-v1.2.0-Portable.zip`.
 3. Extract the ZIP file to a folder of your choice (e.g., `Documents\UsageBar`).
