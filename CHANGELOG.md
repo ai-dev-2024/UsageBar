@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2024-12-29
+
+### Added
+- **Global hotkey** (`Ctrl+Shift+U`): Show/hide tray window from anywhere
+- **Smooth animations**: FadeIn and slideUp transitions for window appearance
+- **Glassmorphism effects**: Backdrop blur and refined layered shadows
+- **Micro-animations**: Hover and press effects on buttons and actions
+
+### Changed
+- Enhanced visual polish matching CodexBar's premium feel
+- Smooth cubic-bezier transitions on usage meters
+- Updated action items with transform animations
+
+---
+
 ## [1.1.0] - 2024-12-29
 
 ### Added

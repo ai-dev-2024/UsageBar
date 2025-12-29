@@ -3,7 +3,7 @@
  * Windows system tray application for AI coding tool usage stats
  */
 
-import { app, Tray, Menu, nativeImage, NativeImage, BrowserWindow, ipcMain, shell } from 'electron';
+import { app, Tray, Menu, nativeImage, NativeImage, BrowserWindow, ipcMain, shell, globalShortcut } from 'electron';
 import * as path from 'path';
 import { SettingsStore } from './settings';
 import { ProviderManager } from './providers';
@@ -39,13 +39,18 @@ app.on('ready', async () => {
     // Register IPC handlers
     setupIPC();
 
+    // Register global hotkey (Ctrl+Shift+U to toggle tray)
+    globalShortcut.register('CommandOrControl+Shift+U', () => {
+        toggleTrayWindow();
+    });
+
     // Configure auto-start
     app.setLoginItemSettings({
         openAtLogin: settings.getAutoStart(),
         path: app.getPath('exe'),
     });
 
-    console.log('UsageBar started successfully');
+    console.log('UsageBar started successfully (Hotkey: Ctrl+Shift+U)');
 });
 
 let trayWindow: BrowserWindow | null = null;

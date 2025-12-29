@@ -28,6 +28,7 @@
 
 - 🖥️ **System Tray Integration** – Lives in your taskbar, always accessible
 - 📊 **Real-time Usage Meters** – Session and weekly usage at a glance
+- ⌨️ **Global Hotkey** – `Ctrl+Shift+U` to show/hide from anywhere
 - ⏱️ **Reset Countdown Timers** – Shows "Resets in 2h 15m" for quick reference
 - 🔔 **Quota Alert Notifications** – Windows toast notification when usage > 80%
 - 🔄 **Auto-Refresh** – Configurable refresh intervals (1-30 minutes)
@@ -60,7 +61,7 @@
 
 ### Windows (Portable) - Recommended
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
-2. Download `UsageBar-v1.1.0-Portable.zip`.
+2. Download `UsageBar-v1.2.0-Portable.zip`.
 3. Extract the ZIP file to a folder of your choice (e.g., `Documents\UsageBar`).
 4. Open the folder and double-click **`UsageBar.exe`** to run.
 5. *(Optional)* Right-click `UsageBar.exe` → "Send to" → "Desktop (create shortcut)" for easy access.
