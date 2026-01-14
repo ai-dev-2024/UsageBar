@@ -41,4 +41,5 @@ contextBridge.exposeInMainWorld('usagebar', {
     downloadUpdate: () => ipcRenderer.send('download-update'),
     installUpdate: () => ipcRenderer.send('install-update'),
     resetAllUsage: () => ipcRenderer.send('reset-all-usage'),
+    onSettingsUpdate: (callback: (settings: any) => void) => ipcRenderer.on('settings-update', (_, settings) => callback(settings)),
 });

@@ -385,7 +385,7 @@ function setupIPC(): void {
         return settings.getAll();
     });
 
-    ipcMain.handle('save-settings', (_, newSettings) => {
+    ipcMain.handle('save-settings', async (_, newSettings) => {
         const oldHotkey = settings.getAll().hotkey;
         settings.setAll(newSettings);
         startRefreshLoop(); // Restart with new interval
@@ -398,6 +398,12 @@ function setupIPC(): void {
         // Immediately notify tray window of enabled providers change
         if (trayWindow && !trayWindow.isDestroyed()) {
             trayWindow.webContents.send('enabled-providers-update', settings.getEnabledProviders());
+            trayWindow.webContents.send('settings-update', settings.getAll());
+        }
+
+        // Also notify settings window if open
+        if (settingsWindow && !settingsWindow.isDestroyed()) {
+            settingsWindow.webContents.send('settings-update', settings.getAll());
         }
 
         return true;
@@ -555,6 +561,14 @@ function setupIPC(): void {
             await refreshUsage();
         }
         return success;
+    });
+
+    // Reset all usage data
+    ipcMain.on('reset-all-usage', () => {
+        const { UsageHistory } = require('./history');
+        const history = new UsageHistory();
+        history.clear();
+        providerManager.clearCache();
     });
 }
 

@@ -737,21 +737,50 @@
                 <div class="form-hint">Keyboard shortcut to toggle the tray popup (e.g., Ctrl+Shift+U).</div>
              </div>
 
-             <div class="form-group">
-                 <label class="toggle-row">
-                   <span class="toggle-label">Reset Session Daily</span>
-                   <label class="switch">
-                     <input type="checkbox" id="gen-reset" ${settings.resetDaily ? 'checked' : ''}>
-                     <span class="slider"></span>
-                   </label>
-                 </label>
-                 <div class="form-hint">Automatically clears session meter every 24 hours.</div>
-             </div>
+              <div class="form-group">
+                  <label class="toggle-row">
+                    <span class="toggle-label">Reset Session Daily</span>
+                    <label class="switch">
+                      <input type="checkbox" id="gen-reset" ${settings.resetDaily ? 'checked' : ''}>
+                      <span class="slider"></span>
+                    </label>
+                  </label>
+                  <div class="form-hint">Automatically clears session meter every 24 hours.</div>
+              </div>
+
+              <div class="form-group">
+                  <label class="toggle-row">
+                    <span class="toggle-label">Start at Login</span>
+                    <label class="switch">
+                      <input type="checkbox" id="gen-autostart" ${settings.autoStart ? 'checked' : ''}>
+                      <span class="slider"></span>
+                    </label>
+                  </label>
+                  <div class="form-hint">Launch UsageBar when Windows starts.</div>
+              </div>
+
+              <div class="form-group">
+                  <label class="toggle-row">
+                    <span class="toggle-label">Notifications</span>
+                    <label class="switch">
+                      <input type="checkbox" id="gen-notifications" ${settings.notifications !== false ? 'checked' : ''}>
+                      <span class="slider"></span>
+                    </label>
+                  </label>
+                  <div class="form-hint">Show alerts when usage exceeds 80%.</div>
+              </div>
           </div>
 
           <div style="margin-top:40px; margin-bottom:20px;">
-             <div style="font-size:18px; font-weight:600; margin-bottom:10px;">Data & Privacy</div>
+             <div style="font-size:18px; font-weight:600; margin-bottom:10px;">Actions</div>
              <div class="feature-card" style="background:transparent; border:1px solid var(--border); padding:24px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                    <div>
+                        <div style="font-weight:500">Refresh All Providers</div>
+                        <div class="form-hint">Immediately fetch latest usage data.</div>
+                    </div>
+                    <button class="btn btn-primary" id="btn-refresh-now" style="background:#14b8a6; border-color:#14b8a6;">Refresh Now</button>
+                </div>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <div style="font-weight:500">Reset All Data</div>
@@ -771,6 +800,21 @@
           ipc.saveSettings(settings);
         };
         document.getElementById('gen-reset').onchange = (e) => settings.resetDaily = e.target.checked;
+        document.getElementById('gen-autostart').onchange = (e) => {
+          settings.autoStart = e.target.checked;
+          ipc.saveSettings(settings);
+        };
+        document.getElementById('gen-notifications').onchange = (e) => settings.notifications = e.target.checked;
+        document.getElementById('btn-refresh-now').onclick = async () => {
+          const btn = document.getElementById('btn-refresh-now');
+          btn.disabled = true;
+          btn.textContent = 'Refreshing...';
+          await ipc.refreshUsage();
+          setTimeout(() => {
+            btn.disabled = false;
+            btn.textContent = 'Refresh Now';
+          }, 2000);
+        };
         document.getElementById('btn-reset-all').onclick = () => {
           if (confirm('Are you sure you want to reset all usage data?')) {
             ipc.resetAllUsage();
@@ -852,8 +896,9 @@
     }
 
     document.getElementById('btn-save').onclick = () => {
-      ipc.saveSettings(settings); // Send back to main
-      alert('Settings saved!');
+      ipc.saveSettings(settings).then(() => {
+        alert('Settings saved!');
+      });
     };
 
     // Theme Logic

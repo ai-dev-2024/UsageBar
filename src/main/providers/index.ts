@@ -132,6 +132,10 @@ export class ProviderManager {
         return { ...this.latestUsage };
     }
 
+    clearCache(): void {
+        this.latestUsage = {};
+    }
+
     getProviderUsage(providerId: string): ProviderUsage | undefined {
         return this.latestUsage[providerId];
     }

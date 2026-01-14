@@ -11,8 +11,11 @@
     "copy-assets": "powershell -Command \"if (-not (Test-Path dist/renderer)) { New-Item -ItemType Directory -Path dist/renderer }; Copy-Item src/renderer/*.html, src/renderer/*.png dist/renderer/\"",
     "start": "electron .",
     "package": "electron-builder --win",
-    "test": "npx playwright test",
-    "test:screenshot": "npx playwright test tests/screenshot.spec.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "test:playwright": "npx playwright test",
+    "format": "prettier --write \"src/**/*.ts\" \"src/**/*.html\"",
     "clean": "rimraf dist"
   },
   "dependencies": {
@@ -25,8 +28,10 @@
     "@types/node": "^20.10.0",
     "electron": "^28.0.0",
     "electron-builder": "^24.9.0",
+    "prettier": "^3.2.0",
     "rimraf": "^5.0.5",
-    "typescript": "^5.3.0"
+    "typescript": "^5.3.0",
+    "vitest": "^1.2.0"
   },
   "build": {
     "appId": "com.usagebar.app",

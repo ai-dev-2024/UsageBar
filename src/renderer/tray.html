@@ -315,6 +315,12 @@
             margin-left: 4px;
         }
 
+        .updated-at {
+            font-size: 11px;
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
         .credits-display {
             padding: 8px 18px;
         }
@@ -452,6 +458,7 @@
             <div class="provider-section">
                 <div class="provider-name" id="p-name">UsageBar</div>
                 <div class="status-line" id="p-status">Loading...</div>
+                <div class="updated-at" id="updated-at" style="font-size:11px;color:var(--text-secondary);margin-top:2px;display:none;"></div>
             </div>
             <div class="account-section">
                 <div class="email" id="p-email"></div>
@@ -480,10 +487,14 @@
                 <div class="usage-label">Credits</div>
                 <div class="usage-meta"><span id="credits-value">--</span></div>
             </div>
-            <!-- Login button for Cursor -->
-            <div class="usage-group" id="login-group" style="display:none;">
-                <button class="login-btn" id="act-login">🔐 Sign in to Cursor</button>
-            </div>
+        <!-- Login button for providers needing auth -->
+        <div class="usage-group" id="login-group" style="display:none;">
+            <button class="login-btn" id="act-login">🔐 Sign in to Provider</button>
+        </div>
+        <!-- Retry button for errors -->
+        <div class="usage-group" id="retry-group" style="display:none;">
+            <button class="login-btn" id="act-retry" style="background:#14b8a6; border-color:#14b8a6;">↻ Retry</button>
+        </div>
         </div>
 
         <div class="divider"></div>
@@ -523,7 +534,9 @@
             sFill: document.getElementById('s-fill'), sText: document.getElementById('s-text'), sReset: document.getElementById('s-reset'),
             wGroup: document.getElementById('w-group'), wFill: document.getElementById('w-fill'), wText: document.getElementById('w-text'), wReset: document.getElementById('w-reset'),
             creditsGroup: document.getElementById('credits-group'), creditsValue: document.getElementById('credits-value'),
-            loginGroup: document.getElementById('login-group'), loginBtn: document.getElementById('act-login')
+            loginGroup: document.getElementById('login-group'), loginBtn: document.getElementById('act-login'),
+            retryGroup: document.getElementById('retry-group'), retryBtn: document.getElementById('act-retry'),
+            updatedAt: document.getElementById('updated-at')
         };
 
         // PREMIUM SVG ICONS - Meticulously sourced paths
@@ -553,6 +566,7 @@
         let lastUsageData = {};
         let enabledProviders = [];
         let notifiedProviders = {}; // Track which providers we've notified about
+        let _notificationEnabled = true; // Will be updated from settings
 
         // Format countdown: "Resets in 2h 15m" or "Resets in 45m"
         function formatCountdown(resetDate) {
@@ -576,9 +590,25 @@
             }
         }
 
+        function formatUpdatedAt(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            const now = new Date();
+            const diffSec = Math.floor((now - date) / 1000);
+
+            if (diffSec < 60) return 'Just now';
+            if (diffSec < 3600) return `${Math.floor(diffSec / 60)}m ago`;
+            if (diffSec < 86400) return `${Math.floor(diffSec / 3600)}h ago`;
+            return date.toLocaleDateString();
+        }
+
         // Check and send quota alert notification
         function checkQuotaAlert(providerId, data) {
             if (!data.primary) return;
+
+            // Check if notifications are enabled
+            if (window._notificationEnabled === false) return;
+
             const usedPercent = data.primary.usedPercent;
             const providerName = providersMeta[providerId]?.name || providerId;
 
@@ -699,11 +729,15 @@
                 zai: 'Configure z.ai in Settings'
             };
 
-            // Hide login button by default
+            // Hide login/retry buttons by default
             els.loginGroup.style.display = 'none';
+            els.retryGroup.style.display = 'none';
 
             // If there's an error or no data
             if (data.error || (!data.primary && !data.secondary)) {
+                const updatedEl = document.getElementById('updated-at');
+                if (updatedEl) updatedEl.style.display = 'none';
+
                 const loginProviders = ['cursor', 'claude', 'copilot'];
 
                 // Check if user needs to login
@@ -716,14 +750,18 @@
                     els.sText.textContent = setupInstructions[activeProviderId] || 'Configure in Settings';
                 } else if (data.error && !data.needsLogin) {
                     // User is logged in but API doesn't return usage (e.g., Claude free tier)
-                    els.status.textContent = 'Logged in ✓';
+                    els.status.textContent = 'Logged in';
                     els.status.style.color = '#22c55e';
                     els.sText.textContent = data.error;
+                    // Show retry button for transient errors
+                    els.retryGroup.style.display = 'block';
                 } else {
                     // Generic error
                     els.status.textContent = 'Yet to be configured';
                     els.status.style.color = '#f59e0b';
                     els.sText.textContent = setupInstructions[activeProviderId] || 'Configure in Settings';
+                    // Show retry button
+                    els.retryGroup.style.display = 'block';
                 }
 
                 // Hide usage bars
@@ -733,6 +771,15 @@
             } else {
                 els.status.textContent = 'Updated just now';
                 els.status.style.color = 'var(--text-secondary)';
+
+                // Show updated timestamp
+                if (data.updatedAt) {
+                    const updatedEl = document.getElementById('updated-at');
+                    if (updatedEl) {
+                        updatedEl.textContent = formatUpdatedAt(data.updatedAt);
+                        updatedEl.style.display = 'block';
+                    }
+                }
 
                 // Check for quota alerts
                 checkQuotaAlert(activeProviderId, data);
@@ -816,10 +863,23 @@
             els.loginBtn.textContent = `Sign in to ${providerName}`;
         };
 
+        // Retry button handler
+        els.retryBtn.onclick = async () => {
+            els.retryBtn.disabled = true;
+            els.retryBtn.textContent = 'Refreshing...';
+            els.status.textContent = 'Refreshing...';
+            await ipc.refreshUsage();
+            setTimeout(() => {
+                els.retryBtn.disabled = false;
+                els.retryBtn.textContent = '↻ Retry';
+            }, 2000);
+        };
+
         // Initialize - fetch enabled providers and usage, then render
-        Promise.all([ipc.getEnabledProviders(), ipc.getUsage()]).then(([enabled, usage]) => {
+        Promise.all([ipc.getEnabledProviders(), ipc.getUsage(), ipc.getSettings()]).then(([enabled, usage, settings]) => {
             enabledProviders = enabled || [];
             lastUsageData = usage;
+            _notificationEnabled = settings.notifications !== false;
             renderTabs(usage);
             updateView();
         });
@@ -835,6 +895,13 @@
             enabledProviders = providers;
             renderTabs(lastUsageData);
             updateView();
+        });
+
+        // Listen for settings updates
+        if (ipc.onSettingsUpdate) ipc.onSettingsUpdate(settings => {
+            if (settings.notifications !== undefined) {
+                _notificationEnabled = settings.notifications;
+            }
         });
 
         // Transparency Slider Logic

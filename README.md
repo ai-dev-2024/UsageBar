@@ -44,7 +44,7 @@
 - 📊 **Real-time Usage Meters** – Session and weekly usage at a glance
 - ⌨️ **Customizable Hotkey** – Default `Ctrl+Shift+U`, configurable in Settings
 - ⏱️ **Reset Countdown Timers** – Shows "Resets in 2h 15m" for quick reference
-- 🔔 **Quota Alert Notifications** – Windows toast notification when usage > 80%
+- 🔔 **Quota Alert Notifications** – Windows toast notification when usage > 80% (configurable)
 - 🔄 **Auto-Refresh** – Configurable refresh intervals (1-30 minutes)
 - 🎨 **Glassmorphism UI** – Modern gradient design with transparency slider
 - 🔌 **Multi-Provider Support** – Monitor usage across multiple AI tools
@@ -53,6 +53,9 @@
 - 🔗 **Quick Links** – Jump to dashboards and status pages
 - 🪟 **Frameless & Resizable** – Drag to move, resize as needed
 - 🆕 **One-Click Updates** – Version badge shows when updates are available
+- 🚀 **Manual Refresh** – One-click refresh button in Settings
+- 🔄 **Retry on Error** – Quick retry button when providers show errors
+- 📱 **Auto-Start** – Launch UsageBar at Windows login
 
 ---
 
@@ -151,6 +154,15 @@ npm install
 # Run development mode
 npm run dev
 
+# Run unit tests
+npm run test
+
+# Check test coverage
+npm run test:coverage
+
+# Format code with Prettier
+npm run format
+
 # Build for production
 npm run package
 
@@ -159,10 +171,22 @@ npm run clean
 ```
 
 ### Tech Stack
-- **Electron** – Cross-platform desktop framework
-- **TypeScript** – Type-safe JavaScript
-- **electron-builder** – Packaging and distribution
-- **electron-store** – Persistent settings storage
+- **Electron 28** – Cross-platform desktop framework
+- **TypeScript 5** – Type-safe JavaScript
+- **Vitest** – Unit testing with coverage
+- **Electron-Builder** – Packaging and distribution
+- **Electron-Store** – Persistent settings storage
+- **Prettier** – Code formatting
+
+### Testing
+- Unit tests for utilities (logger, retry, circuit-breaker)
+- Vitest with coverage reporting (v8 provider)
+- 80%+ coverage target for utilities
+
+### CI/CD
+- **GitHub Actions** – Automated builds on push/PR
+- **Dependabot** – Weekly dependency vulnerability scans
+- **Auto-Release** – Builds Windows installer on version tags
 
 ---
 
