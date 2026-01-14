@@ -11,12 +11,13 @@
   <img src="https://img.shields.io/badge/Built%20with-Antigravity-667eea?style=for-the-badge" alt="Built with Antigravity">
   <a href="https://ko-fi.com/ai_dev_2024"><img src="https://img.shields.io/badge/☕_Ko--fi-Support-FF5E5B?style=for-the-badge" alt="Ko-fi"></a>
   <img src="https://img.shields.io/github/v/release/ai-dev-2024/UsageBar?style=for-the-badge&color=14b8a6" alt="Release">
+  <img src="https://img.shields.io/github/actions/workflow/status/ai-dev-2024/UsageBar/ci.yml?style=for-the-badge&label=CI" alt="CI">
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
 </p>
 
 <p align="center">
   <a href="https://github.com/ai-dev-2024/UsageBar/releases/latest">
-    <img src="https://img.shields.io/badge/⬇️_Download_Latest-v1.4.1-22c55e?style=for-the-badge&logoColor=white" alt="Download">
+    <img src="https://img.shields.io/badge/⬇️_Download_Latest-v1.5.0-22c55e?style=for-the-badge&logoColor=white" alt="Download">
   </a>
 </p>
 
@@ -79,7 +80,7 @@
 
 ### Windows (Portable) - Recommended
 
-> **Latest Version**: [v1.4.1](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.4.1) – Glassmorphism UI, transparency slider, click-to-update
+> **Latest Version**: [v1.5.0](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.5.0) – Cloud CI/CD, auto-release, test coverage
 
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
 2. Download `UsageBar-v1.4.1-Portable.zip`.
@@ -147,28 +148,32 @@ Each provider can be individually enabled/disabled. Some require additional conf
 
 ## 🛠️ Development
 
+### Local Setup
 ```bash
-# Install dependencies
+# Clone and install
+git clone https://github.com/ai-dev-2024/UsageBar.git
+cd UsageBar
 npm install
 
-# Run development mode
+# Run locally for testing
 npm run dev
-
-# Run unit tests
-npm run test
-
-# Check test coverage
-npm run test:coverage
-
-# Format code with Prettier
-npm run format
-
-# Build for production
-npm run package
-
-# Clean build artifacts
-npm run clean
 ```
+
+### What to Do Locally
+| Task | Command |
+|------|---------|
+| Test changes | `npm run dev` |
+| Format code | `npm run format` |
+| Run tests locally | `npm run test` |
+
+### Everything Else is Cloud-Only
+| Task | Where |
+|------|-------|
+| Lint & type check | GitHub Actions |
+| Unit tests | GitHub Actions |
+| Build Windows installer | GitHub Actions |
+| Create release | GitHub Actions |
+| Close issues | GitHub Actions |
 
 ### Tech Stack
 - **Electron 28** – Cross-platform desktop framework
@@ -177,16 +182,34 @@ npm run clean
 - **Electron-Builder** – Packaging and distribution
 - **Electron-Store** – Persistent settings storage
 - **Prettier** – Code formatting
+- **GitHub Actions** – Cloud CI/CD
+- **Auto-Resolve** – Cloud-only issue/PR resolution on release
 
-### Testing
-- Unit tests for utilities (logger, retry, circuit-breaker)
-- Vitest with coverage reporting (v8 provider)
-- 80%+ coverage target for utilities
+### ☁️ Cloud-Only Development
 
-### CI/CD
-- **GitHub Actions** – Automated builds on push/PR
-- **Dependabot** – Weekly dependency vulnerability scans
-- **Auto-Release** – Builds Windows installer on version tags
+**Everything happens in GitHub's cloud - no local build servers needed!**
+
+| Action | Where |
+|--------|-------|
+| TypeScript build | GitHub Actions |
+| Unit tests | GitHub Actions |
+| Test coverage | GitHub Actions |
+| Windows installer build | GitHub Actions |
+| Release creation | GitHub Actions |
+| Issue resolution | GitHub Actions |
+
+**To release (cloud-only):**
+```bash
+# Just push a version tag - everything else happens automatically!
+git tag v1.5.0
+git push origin v1.5.0
+
+# GitHub Actions will:
+# 1. Build and test
+# 2. Create release with auto-generated notes
+# 3. Upload Windows installer
+# 4. Auto-close resolved issues
+```
 
 ---
 
