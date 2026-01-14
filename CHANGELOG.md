@@ -2,13 +2,29 @@
 
 All notable changes to UsageBar will be documented in this file.
 
-## [1.4.1] - 2025-12-29
+## [1.5.0] - 2026-01-15
+
+### ✨ New Features
+- **Unit Testing** – Added Vitest with 12 tests for utilities
+- **Code Quality** – Prettier code formatting with consistent style
+- **TypeScript Types** – Shared interfaces in `src/types.ts`
+
+### 🔧 Infrastructure
+- **CI/CD Pipeline** – Enhanced GitHub Actions (lint, build, test, coverage)
+- **Auto-Release** – Windows installer builds automatically on version tags
+- **Dependabot** – Weekly dependency vulnerability scanning
+- **Circuit Breaker** – Resilience pattern for API failures
+- **Retry Utility** – Exponential backoff for API retries
+- **Structured Logger** – JSON-formatted logging with levels
+
+### 📦 Developer Experience
+- **AGENTS.md** – Claude AI development guide
+- **VS Code Config** – Recommended extensions and settings
+- **Test Coverage** – v8 coverage reporting with 80%+ target
 
 ### 🐛 Bug Fixes
-- **Toggle Switch Visibility** – Fixed enabled toggle visibility with bright teal color (#14b8a6)
-
-### 🎨 UI Improvements
-- **Ko-fi Button in Sidebar** – Moved support button to sidebar for better accessibility
+- Fixed TypeScript strict mode compliance
+- Excluded test files from main build
 
 ---
 

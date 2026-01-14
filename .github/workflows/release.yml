@@ -8,22 +8,27 @@ on:
 permissions:
   contents: write
   packages: write
+  issues: write
+  pull-requests: write
 
 jobs:
   release:
     runs-on: windows-latest
+    environment: release
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
+          registry-url: 'https://npm.pkg.github.com'
 
       - name: Install dependencies
         run: npm ci
@@ -35,6 +40,49 @@ jobs:
         id: version
         run: echo "VERSION=${npm_package_version}" >> $GITHUB_OUTPUT
 
+      - name: Generate Release Notes
+        id: release_notes
+        uses: actions/github-script@v7
+        with:
+          result-encoding: string
+          script: |
+            const { data: commits } = await github.rest.repos.listCommits({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              since: git.createShaDatePath(new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)),
+              per_page: 100
+            });
+
+            const { data: releases } = await github.rest.repos.listReleases({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              per_page: 1
+            });
+
+            const lastRelease = releases[0]?.tag_name || 'v0.0.0';
+            const newCommits = commits.filter(c => !c.commit.message.startsWith('Merge') && !c.commit.message.includes(lastRelease));
+
+            const features = newCommits.filter(c => c.commit.message.match(/^feat/i));
+            const fixes = newCommits.filter(c => c.commit.message.match(/^fix/i));
+            const chores = newCommits.filter(c => c.commit.message.match(/^chore/i));
+
+            let notes = `## What's Changed\n\n`;
+            if (features.length) {
+              notes += `### ✨ New Features\n${features.map(c => `- ${c.commit.message.split('\n')[0]} (#${c.sha.substring(0, 7)})`).join('\n')}\n\n`;
+            }
+            if (fixes.length) {
+              notes += `### 🐛 Bug Fixes\n${fixes.map(c => `- ${c.commit.message.split('\n')[0]} (#${c.sha.substring(0, 7)})`).join('\n')}\n\n`;
+            }
+            if (chores.length) {
+              notes += `### 🔧 Infrastructure\n${chores.map(c => `- ${c.commit.message.split('\n')[0]} (#${c.sha.substring(0, 7)})`).join('\n')}\n\n`;
+            }
+
+            notes += `---\n\n**Full Changelog**: https://github.com/${context.repo.owner}/${context.repo.repo}/compare/${lastRelease}...${process.env.VERSION}`;
+
+            return notes;
+        env:
+          VERSION: ${{ steps.version.outputs.VERSION }}
+
       - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
@@ -44,19 +92,17 @@ jobs:
           draft: false
           prerelease: false
           name: Release ${{ steps.version.outputs.VERSION }}
-          body: |
-            See [CHANGELOG.md](./CHANGELOG.md) for details.
+          body: ${{ steps.release_notes.outputs.result }}
+          tag_name: ${{ github.ref_name }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build Windows Installer
-        if: startsWith(github.ref, 'refs/tags/v')
         run: npm run package
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Upload Release Asset
-        if: startsWith(github.ref, 'refs/tags/v')
         uses: actions/upload-release-asset@v1
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
@@ -65,3 +111,77 @@ jobs:
           asset_content_type: application/zip
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Auto-close Milestone
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const milestone = await github.rest.search.issuesAndPullRequests({
+              q: 'repo:${{ context.repo.owner }}/${{ context.repo.repo }} milestone:${{ steps.version.outputs.VERSION }} state:open'
+            });
+
+            if (milestone.data.items.length > 0) {
+              await github.rest.actions.createWorkflowRun({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                workflow_id: 'close-milestone.yml',
+                ref: 'main',
+                inputs: {
+                  milestone: '${{ steps.version.outputs.VERSION }}'
+                }
+              });
+            }
+        ignore_errors: true
+
+      - name: Notify Related Issues
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: issues } = await github.rest.search.issuesAndPullRequests({
+              q: 'repo:${{ context.repo.owner }}/${{ context.repo.repo }} is:issue is:open release-notes',
+              per_page: 50
+            });
+
+            for (const issue of issues.data.items) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: '🚀 This issue is addressed in release `${{ steps.version.outputs.VERSION }}` - it will be auto-closed when the release is published.'
+              });
+
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+                state_reason: 'completed'
+              });
+            }
+        ignore_errors: true
+
+      - name: Update Related PRs
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: prs } = await github.rest.search.issuesAndPullRequests({
+              q: 'repo:${{ context.repo.owner }}/${{ context.repo.repo }} is:pr is:open merged:false',
+              per_page: 50
+            });
+
+            for (const pr of prs.data.items) {
+              await github.rest.pulls.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                state: 'closed'
+              });
+
+              await github.rest.pulls.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                pull_number: pr.number,
+                body: '🎉 This PR is included in release `${{ steps.version.outputs.VERSION }}` - thank you for your contribution!'
+              });
+            }
+        ignore_errors: true

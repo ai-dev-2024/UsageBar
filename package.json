@@ -1,6 +1,6 @@
 {
   "name": "usagebar",
-  "version": "1.4.1",
+  "version": "1.5.0",
   "description": "Windows system tray app showing AI coding tool usage stats",
   "main": "dist/main/index.js",
   "author": "UsageBar",
