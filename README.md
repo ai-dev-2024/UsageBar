@@ -13,6 +13,7 @@
   <img src="https://img.shields.io/github/v/release/ai-dev-2024/UsageBar?style=for-the-badge&color=14b8a6" alt="Release">
   <img src="https://img.shields.io/github/actions/workflow/status/ai-dev-2024/UsageBar/ci.yml?style=for-the-badge&label=CI" alt="CI">
   <img src="https://img.shields.io/badge/License-MIT-green?style=for-the-badge" alt="License">
+  <a href="https://startup.z.ai/"><img src="https://img.shields.io/badge/Part%20of-ZAI%20Start--up%20Community-8b5cf6?style=for-the-badge" alt="ZAI Community"></a>
 </p>
 
 <p align="center">
