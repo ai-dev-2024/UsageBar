@@ -11,34 +11,8 @@ import { CursorProvider } from './cursor';
 import { GeminiProvider } from './gemini';
 import { FactoryProvider } from './factory';
 import { ZaiProvider } from './zai';
-
-export interface RateWindow {
-    usedPercent: number;
-    windowMinutes?: number;
-    resetsAt?: string;
-    resetDescription?: string;
-}
-
-export interface ProviderUsage {
-    providerId: string;
-    displayName: string;
-    primary?: RateWindow;
-    secondary?: RateWindow;
-    tertiary?: RateWindow;
-    accountEmail?: string;
-    accountPlan?: string;
-    version?: string;
-    error?: string;
-    needsLogin?: boolean;  // For providers that require browser login
-    updatedAt: string;
-    // New fields for macOS parity
-    credits?: {
-        balance: string;
-        unlimited: boolean;
-    };
-    dashboardUrl?: string;
-    statusPageUrl?: string;
-}
+import type { ProviderUsage, RateWindow } from '../../types';
+export type { ProviderUsage, RateWindow };
 
 export interface Provider {
     id: string;

@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "npm run build && electron .",
     "build": "tsc && npm run copy-assets",
+    "lint": "tsc --noEmit",
     "copy-assets": "powershell -Command \"if (-not (Test-Path dist/renderer)) { New-Item -ItemType Directory -Path dist/renderer }; Copy-Item src/renderer/*.html, src/renderer/*.png dist/renderer/\"",
     "start": "electron .",
     "package": "electron-builder --win",
@@ -16,6 +17,7 @@
     "test:coverage": "vitest run --coverage",
     "test:playwright": "npx playwright test",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.html\"",
+    "format:check": "prettier --check \"src/**/*.ts\" \"src/**/*.html\"",
     "clean": "rimraf dist"
   },
   "dependencies": {

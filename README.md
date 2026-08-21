@@ -84,7 +84,7 @@
 > **Latest Version**: [v1.5.0](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.5.0) – Cloud CI/CD, auto-release, test coverage
 
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
-2. Download `UsageBar-v1.4.1-Portable.zip`.
+2. Download the latest `UsageBar-*.zip` asset from that release.
 3. Extract the ZIP file to a folder of your choice (e.g., `Documents\UsageBar`).
 4. Open the folder and double-click **`UsageBar.exe`** to run.
 5. *(Optional)* Right-click `UsageBar.exe` → "Send to" → "Desktop (create shortcut)" for easy access.
@@ -116,7 +116,7 @@ npm run package
 
 ## 🔌 Supported Providers
 
-> **Status Summary**: ✅ **3 Tested & Working** | ⚠️ **1 Limited** | ❓ **3 Untested**
+> **Status Summary**: ✅ **3 Tested & Working** | ⚠️ **1 Limited** | ❓ **4 Untested**
 
 | Provider | Auth Method | Status | Docs |
 |----------|-------------|--------|------|
@@ -125,6 +125,7 @@ npm run package
 | **Antigravity (Windsurf)** | Auto-detect | ✅ Tested | [docs/antigravity.md](docs/antigravity.md) |
 | **Claude** | Browser/CLI | ⚠️ Limited | [docs/claude.md](docs/claude.md) |
 | **Codex (OpenAI)** | CLI | ❓ Untested | [docs/codex.md](docs/codex.md) |
+| **Gemini** | CLI/OAuth | ❓ Untested | [docs/gemini.md](docs/gemini.md) |
 | **Factory (Droid)** | App login | ❓ Untested | [docs/factory.md](docs/factory.md) |
 | **z.ai** | API Token | ❓ Untested | [docs/zai.md](docs/zai.md) |
 

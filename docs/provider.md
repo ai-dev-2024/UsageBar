@@ -18,6 +18,7 @@ src/main/providers/
 ├── claude.ts          # Claude provider
 ├── antigravity.ts     # Antigravity/Windsurf provider
 ├── codex.ts           # OpenAI Codex provider
+├── gemini.ts          # Google Gemini provider
 ├── factory.ts         # Factory/Droid provider
 └── zai.ts             # z.ai provider
 ```
@@ -45,6 +46,7 @@ Providers use different strategies to obtain usage data:
 | **OAuth device flow** | GitHub-style code entry | Copilot |
 | **CLI detection** | Check for installed CLI tools | Claude, Codex |
 | **Process detection** | Find running applications | Antigravity |
+| **CLI + OAuth quota API** | Read CLI credentials and call provider API | Gemini |
 | **API token** | Environment variable or config | z.ai |
 | **App credentials** | Read from app data folder | Factory |
 
@@ -64,3 +66,4 @@ Providers use different strategies to obtain usage data:
 - [copilot.md](./copilot.md) - GitHub Copilot provider details
 - [claude.md](./claude.md) - Claude provider details
 - [antigravity.md](./antigravity.md) - Antigravity provider details
+- [gemini.md](./gemini.md) - Gemini provider details
