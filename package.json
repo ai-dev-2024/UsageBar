@@ -9,7 +9,7 @@
     "dev": "npm run build && electron .",
     "build": "tsc && npm run copy-assets",
     "lint": "tsc --noEmit",
-    "copy-assets": "powershell -Command \"if (-not (Test-Path dist/renderer)) { New-Item -ItemType Directory -Path dist/renderer }; Copy-Item src/renderer/*.html, src/renderer/*.png dist/renderer/\"",
+    "copy-assets": "node -e \"const fs=require('node:fs');const path=require('node:path');const src='src/renderer';const dst='dist/renderer';fs.mkdirSync(dst,{recursive:true});for(const file of fs.readdirSync(src)){if(/\\\\.(html|png)$/i.test(file)){fs.copyFileSync(path.join(src,file),path.join(dst,file));}}\"",
     "start": "electron .",
     "package": "electron-builder --win",
     "test": "vitest run",
