@@ -1,5 +1,11 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { ProviderManager, type Provider } from '../src/main/providers';
+
+vi.mock('electron', () => ({
+    app: {
+        getPath: () => '/tmp',
+    },
+}));
 
 function createManager(enabledProviders: string[] = ['test']) {
     const fakeSettings = {

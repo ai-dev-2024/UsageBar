@@ -17,7 +17,6 @@
     "test:coverage": "vitest run --coverage",
     "test:playwright": "npx playwright test",
     "format": "prettier --write \"src/**/*.ts\" \"src/**/*.html\"",
-    "format:check": "prettier --check \"src/**/*.ts\" \"src/**/*.html\"",
     "clean": "rimraf dist"
   },
   "dependencies": {
