@@ -25,3 +25,9 @@ npm-debug.log*
 *-session.json
 *-token.json
 *.cookies
+
+# Test output and local tools
+playwright-report/
+test-results/
+coverage/
+*.exe
