@@ -18,7 +18,7 @@
 
 <p align="center">
   <a href="https://github.com/ai-dev-2024/UsageBar/releases/latest">
-    <img src="https://img.shields.io/badge/⬇️_Download_Latest-v1.5.0-22c55e?style=for-the-badge&logoColor=white" alt="Download">
+    <img src="https://img.shields.io/badge/⬇️_Download_Latest-v1.4.1-22c55e?style=for-the-badge&logoColor=white" alt="Download">
   </a>
 </p>
 
@@ -81,7 +81,7 @@
 
 ### Windows (Portable) - Recommended
 
-> **Latest Version**: [v1.5.0](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.5.0) – Cloud CI/CD, auto-release, test coverage
+> **Latest Version**: [v1.4.1](https://github.com/ai-dev-2024/UsageBar/releases/tag/v1.4.1)
 
 1. Go to **[Releases](https://github.com/ai-dev-2024/UsageBar/releases)**.
 2. Download `UsageBar-v1.4.1-Portable.zip`.
