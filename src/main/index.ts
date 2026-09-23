@@ -3,7 +3,17 @@
  * Windows system tray application for AI coding tool usage stats
  */
 
-import { app, Tray, Menu, nativeImage, NativeImage, BrowserWindow, ipcMain, shell, globalShortcut } from 'electron';
+import {
+    app,
+    Tray,
+    Menu,
+    nativeImage,
+    NativeImage,
+    BrowserWindow,
+    ipcMain,
+    shell,
+    globalShortcut,
+} from 'electron';
 import * as path from 'path';
 import { SettingsStore } from './settings';
 import { ProviderManager } from './providers';
@@ -101,8 +111,8 @@ function createTrayWindow() {
             nodeIntegration: false,
             contextIsolation: true,
             preload: path.join(__dirname, '..', 'preload', 'index.js'),
-            backgroundThrottling: false
-        }
+            backgroundThrottling: false,
+        },
     });
 
     // Load the tray HTML
@@ -117,7 +127,7 @@ function createTrayWindow() {
                 width: bounds.width,
                 height: bounds.height,
                 x: bounds.x,
-                y: bounds.y
+                y: bounds.y,
             });
         }
     });
@@ -144,7 +154,7 @@ function toggleTrayWindow() {
         const workArea = display.workArea;
 
         // Calculate position - try to center horizontally on tray
-        let x = Math.round(trayBounds.x + (trayBounds.width / 2) - (windowBounds.width / 2));
+        let x = Math.round(trayBounds.x + trayBounds.width / 2 - windowBounds.width / 2);
         let y = Math.round(trayBounds.y - windowBounds.height - 10);
 
         // Ensure window stays within screen bounds
@@ -197,7 +207,7 @@ function createDefaultIcon(): NativeImage {
     for (let y = 0; y < size; y++) {
         for (let x = 0; x < size; x++) {
             const i = (y * size + x) * 4;
-            canvas[i] = 50;     // R
+            canvas[i] = 50; // R
             canvas[i + 1] = 150 + Math.floor((x / size) * 100); // G
             canvas[i + 2] = 200; // B
             canvas[i + 3] = 255; // A
@@ -241,11 +251,7 @@ async function refreshUsage(): Promise<void> {
         const history = new UsageHistory();
         for (const [providerId, data] of Object.entries(usage)) {
             if (data?.primary?.usedPercent !== undefined) {
-                history.record(
-                    providerId,
-                    data.primary.usedPercent,
-                    data.secondary?.usedPercent
-                );
+                history.record(providerId, data.primary.usedPercent, data.secondary?.usedPercent);
             }
         }
 
@@ -277,12 +283,15 @@ function updateTrayIcon(): void {
         providerName = usage[selectedProviderId].displayName || selectedProviderId;
     } else {
         // Fall back to average of all enabled providers
-        let totalSession = 0, totalWeekly = 0, count = 0;
+        let totalSession = 0,
+            totalWeekly = 0,
+            count = 0;
         for (const providerId of enabledProviders) {
             const providerUsage = usage[providerId];
             if (providerUsage?.primary) {
                 totalSession += providerUsage.primary.usedPercent;
-                totalWeekly += providerUsage.secondary?.usedPercent || providerUsage.primary.usedPercent;
+                totalWeekly +=
+                    providerUsage.secondary?.usedPercent || providerUsage.primary.usedPercent;
                 count++;
             }
         }
@@ -355,7 +364,7 @@ function openSettings(): void {
                 width: bounds.width,
                 height: bounds.height,
                 x: bounds.x,
-                y: bounds.y
+                y: bounds.y,
             });
         }
     };
@@ -454,7 +463,7 @@ function setupIPC(): void {
                 x: bounds.x,
                 y: bounds.y - delta,
                 width: width,
-                height: height
+                height: height,
             });
         }
     });
@@ -470,7 +479,7 @@ function setupIPC(): void {
                 title: title,
                 body: body,
                 icon: path.join(__dirname, '../../assets/icon.png'),
-                silent: false
+                silent: false,
             });
             notification.show();
         }

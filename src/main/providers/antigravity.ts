@@ -101,7 +101,9 @@ export class AntigravityProvider implements Provider {
             console.log('[Antigravity] WMIC output length:', wmicOut?.length);
 
             if (!wmicOut || wmicOut.trim() === '') {
-                throw new Error('Antigravity/Codeium language server not detected. Launch Windsurf/VS Code and retry.');
+                throw new Error(
+                    'Antigravity/Codeium language server not detected. Launch Windsurf/VS Code and retry.'
+                );
             }
 
             // Parse WMIC output - it's in key=value format
@@ -122,7 +124,12 @@ export class AntigravityProvider implements Provider {
 
                 if (!commandLine || !pid) continue;
 
-                console.log('[Antigravity] Found process PID:', pid, 'CommandLine length:', commandLine.length);
+                console.log(
+                    '[Antigravity] Found process PID:',
+                    pid,
+                    'CommandLine length:',
+                    commandLine.length
+                );
 
                 // Extract CSRF token
                 const csrfToken = this.extractFlag('--csrf_token', commandLine);
@@ -144,13 +151,18 @@ export class AntigravityProvider implements Provider {
                 };
             }
 
-            throw new Error('Antigravity/Codeium language server not detected. Launch Windsurf/VS Code and retry.');
+            throw new Error(
+                'Antigravity/Codeium language server not detected. Launch Windsurf/VS Code and retry.'
+            );
         } catch (error) {
             if (error instanceof Error && error.message.includes('not detected')) {
                 throw error;
             }
             console.error('[Antigravity] Detection error:', error);
-            throw new Error('Failed to detect Antigravity process: ' + (error instanceof Error ? error.message : 'Unknown error'));
+            throw new Error(
+                'Failed to detect Antigravity process: ' +
+                    (error instanceof Error ? error.message : 'Unknown error')
+            );
         }
     }
 
@@ -225,10 +237,18 @@ export class AntigravityProvider implements Provider {
     }
 
     private async testPort(port: number, csrfToken: string): Promise<void> {
-        await this.makeRequest(port, csrfToken, '/exa.language_server_pb.LanguageServerService/GetUnleashData');
+        await this.makeRequest(
+            port,
+            csrfToken,
+            '/exa.language_server_pb.LanguageServerService/GetUnleashData'
+        );
     }
 
-    private async makeRequest(port: number, csrfToken: string, path: string): Promise<UserStatusResponse> {
+    private async makeRequest(
+        port: number,
+        csrfToken: string,
+        path: string
+    ): Promise<UserStatusResponse> {
         const url = `https://127.0.0.1:${port}${path}`;
 
         const body = {
@@ -281,8 +301,8 @@ export class AntigravityProvider implements Provider {
 
         const modelConfigs = userStatus.cascadeModelConfigData?.clientModelConfigs || [];
         const quotas: ModelQuota[] = modelConfigs
-            .filter((config) => config.quotaInfo)
-            .map((config) => ({
+            .filter(config => config.quotaInfo)
+            .map(config => ({
                 label: config.label,
                 modelId: config.modelOrAlias.model,
                 remainingFraction: config.quotaInfo?.remainingFraction,
@@ -293,8 +313,10 @@ export class AntigravityProvider implements Provider {
         const selectedQuotas = this.selectModels(quotas);
 
         const primary = this.quotaToRateWindow(selectedQuotas[0]);
-        const secondary = selectedQuotas.length > 1 ? this.quotaToRateWindow(selectedQuotas[1]) : undefined;
-        const tertiary = selectedQuotas.length > 2 ? this.quotaToRateWindow(selectedQuotas[2]) : undefined;
+        const secondary =
+            selectedQuotas.length > 1 ? this.quotaToRateWindow(selectedQuotas[1]) : undefined;
+        const tertiary =
+            selectedQuotas.length > 2 ? this.quotaToRateWindow(selectedQuotas[2]) : undefined;
 
         const planInfo = userStatus.planStatus?.planInfo;
         const planName =
@@ -325,23 +347,25 @@ export class AntigravityProvider implements Provider {
 
         // Prioritize Claude without thinking
         const claude = quotas.find(
-            (q) => q.label.toLowerCase().includes('claude') && !q.label.toLowerCase().includes('thinking')
+            q =>
+                q.label.toLowerCase().includes('claude') &&
+                !q.label.toLowerCase().includes('thinking')
         );
         if (claude) selected.push(claude);
 
         // Then Gemini Pro Low
         const proPlow = quotas.find(
-            (q) => q.label.toLowerCase().includes('pro') && q.label.toLowerCase().includes('low')
+            q => q.label.toLowerCase().includes('pro') && q.label.toLowerCase().includes('low')
         );
-        if (proPlow && !selected.some((s) => s.label === proPlow.label)) {
+        if (proPlow && !selected.some(s => s.label === proPlow.label)) {
             selected.push(proPlow);
         }
 
         // Then Gemini Flash
         const flash = quotas.find(
-            (q) => q.label.toLowerCase().includes('gemini') && q.label.toLowerCase().includes('flash')
+            q => q.label.toLowerCase().includes('gemini') && q.label.toLowerCase().includes('flash')
         );
-        if (flash && !selected.some((s) => s.label === flash.label)) {
+        if (flash && !selected.some(s => s.label === flash.label)) {
             selected.push(flash);
         }
 
@@ -358,9 +382,10 @@ export class AntigravityProvider implements Provider {
     private quotaToRateWindow(quota?: ModelQuota): RateWindow | undefined {
         if (!quota) return undefined;
 
-        const remainingPercent = quota.remainingFraction !== undefined
-            ? Math.max(0, Math.min(100, quota.remainingFraction * 100))
-            : 0;
+        const remainingPercent =
+            quota.remainingFraction !== undefined
+                ? Math.max(0, Math.min(100, quota.remainingFraction * 100))
+                : 0;
 
         return {
             usedPercent: 100 - remainingPercent,

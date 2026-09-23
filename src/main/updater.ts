@@ -13,16 +13,16 @@ let updateWindow: BrowserWindow | null = null;
 
 export function setupAutoUpdater(): void {
     // Check for updates silently on startup
-    autoUpdater.checkForUpdates().catch((err) => {
+    autoUpdater.checkForUpdates().catch(err => {
         console.log('Update check failed:', err.message);
     });
 
     // Update available
-    autoUpdater.on('update-available', (info) => {
+    autoUpdater.on('update-available', info => {
         console.log('Update available:', info.version);
 
         // Notify all browser windows (Settings) about the update
-        BrowserWindow.getAllWindows().forEach((win) => {
+        BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('update-available', info.version);
         });
 
@@ -31,7 +31,7 @@ export function setupAutoUpdater(): void {
             const notification = new Notification({
                 title: 'UsageBar Update Available',
                 body: `Version ${info.version} is available. Click to download.`,
-                icon: undefined
+                icon: undefined,
             });
             notification.on('click', () => {
                 autoUpdater.downloadUpdate();
@@ -41,54 +41,56 @@ export function setupAutoUpdater(): void {
     });
 
     // Download progress - notify renderer
-    autoUpdater.on('download-progress', (progress) => {
+    autoUpdater.on('download-progress', progress => {
         console.log(`Download progress: ${progress.percent.toFixed(1)}%`);
-        BrowserWindow.getAllWindows().forEach((win) => {
+        BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('update-download-progress', progress.percent);
         });
     });
 
     // Update downloaded
-    autoUpdater.on('update-downloaded', (info) => {
+    autoUpdater.on('update-downloaded', info => {
         console.log('Update downloaded:', info.version);
 
         // Notify renderer that download is complete
-        BrowserWindow.getAllWindows().forEach((win) => {
+        BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('update-downloaded', info.version);
         });
 
-        dialog.showMessageBox({
-            type: 'info',
-            title: 'Update Ready',
-            message: `Version ${info.version} has been downloaded.`,
-            detail: 'The update will be installed when you quit UsageBar.',
-            buttons: ['Install Now', 'Later'],
-            defaultId: 0
-        }).then((result) => {
-            if (result.response === 0) {
-                autoUpdater.quitAndInstall(false, true);
-            }
-        });
+        dialog
+            .showMessageBox({
+                type: 'info',
+                title: 'Update Ready',
+                message: `Version ${info.version} has been downloaded.`,
+                detail: 'The update will be installed when you quit UsageBar.',
+                buttons: ['Install Now', 'Later'],
+                defaultId: 0,
+            })
+            .then(result => {
+                if (result.response === 0) {
+                    autoUpdater.quitAndInstall(false, true);
+                }
+            });
     });
 
     // Error handling
-    autoUpdater.on('error', (err) => {
+    autoUpdater.on('error', err => {
         console.log('Auto-updater error:', err.message);
-        BrowserWindow.getAllWindows().forEach((win) => {
+        BrowserWindow.getAllWindows().forEach(win => {
             win.webContents.send('update-error', err.message);
         });
     });
 }
 
 export function checkForUpdates(): void {
-    autoUpdater.checkForUpdates().catch((err) => {
+    autoUpdater.checkForUpdates().catch(err => {
         console.log('Manual update check failed:', err.message);
     });
 }
 
 // Start downloading update (called from renderer via IPC)
 export function downloadUpdate(): void {
-    autoUpdater.downloadUpdate().catch((err) => {
+    autoUpdater.downloadUpdate().catch(err => {
         console.log('Download update failed:', err.message);
     });
 }

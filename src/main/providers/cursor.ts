@@ -1,7 +1,7 @@
 /**
  * Cursor Provider - Implementation based on CodexBar
  * Uses browser login flow to capture session cookies and fetch usage from cursor.com API
- * 
+ *
  * API Endpoints:
  * - https://cursor.com/api/usage-summary - Usage data
  * - https://cursor.com/api/auth/me - User info
@@ -33,7 +33,7 @@ interface CursorUsageSummary {
     individualUsage?: {
         plan?: {
             enabled?: boolean;
-            used?: number;  // Usage in cents
+            used?: number; // Usage in cents
             limit?: number; // Limit in cents
             remaining?: number;
             totalPercentUsed?: number;
@@ -152,7 +152,7 @@ export class CursorProvider implements Provider {
      * Returns true if login was successful
      */
     async openLoginWindow(): Promise<boolean> {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             console.log('[Cursor] Opening login window...');
 
             // Close existing window if any
@@ -241,8 +241,8 @@ export class CursorProvider implements Provider {
      */
     private async saveSessionCookies(cookies: Electron.Cookie[]): Promise<void> {
         try {
-            const relevantCookies = cookies.filter(c =>
-                c.domain?.includes('cursor.com') || c.domain?.includes('cursor.sh')
+            const relevantCookies = cookies.filter(
+                c => c.domain?.includes('cursor.com') || c.domain?.includes('cursor.sh')
             );
 
             const sessionData: StoredSession = {
@@ -326,9 +326,7 @@ export class CursorProvider implements Provider {
         }
 
         // Build cookie header
-        const cookieHeader = validCookies
-            .map(c => `${c.name}=${c.value}`)
-            .join('; ');
+        const cookieHeader = validCookies.map(c => `${c.name}=${c.value}`).join('; ');
 
         console.log('[Cursor] Cookie header built with', validCookies.length, 'cookies');
         return cookieHeader;
@@ -344,12 +342,13 @@ export class CursorProvider implements Provider {
                 `${this.baseURL}/api/usage-summary`,
                 {
                     headers: {
-                        'Accept': 'application/json',
-                        'Cookie': cookieHeader,
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        Accept: 'application/json',
+                        Cookie: cookieHeader,
+                        'User-Agent':
+                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                     },
                     timeout: this.timeout,
-                    validateStatus: (status) => status < 500,
+                    validateStatus: status => status < 500,
                 }
             );
 
@@ -382,18 +381,15 @@ export class CursorProvider implements Provider {
      */
     private async fetchUserInfo(cookieHeader: string): Promise<CursorUserInfo | null> {
         try {
-            const response = await axios.get<CursorUserInfo>(
-                `${this.baseURL}/api/auth/me`,
-                {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cookie': cookieHeader,
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    },
-                    timeout: this.timeout,
-                    validateStatus: (status) => status < 500,
-                }
-            );
+            const response = await axios.get<CursorUserInfo>(`${this.baseURL}/api/auth/me`, {
+                headers: {
+                    Accept: 'application/json',
+                    Cookie: cookieHeader,
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                },
+                timeout: this.timeout,
+                validateStatus: status => status < 500,
+            });
 
             if (response.status === 200) {
                 return response.data;
@@ -407,7 +403,10 @@ export class CursorProvider implements Provider {
     /**
      * Parse usage summary into ProviderUsage format
      */
-    private parseUsageSummary(summary: CursorUsageSummary, userInfo: CursorUserInfo | null): ProviderUsage {
+    private parseUsageSummary(
+        summary: CursorUsageSummary,
+        userInfo: CursorUserInfo | null
+    ): ProviderUsage {
         // Parse billing cycle end date
         let billingCycleEnd: string | undefined;
         if (summary.billingCycleEnd) {
@@ -429,7 +428,9 @@ export class CursorProvider implements Provider {
         // For free/hobby plans, also check the display messages
         if (planPercentUsed === 0 && summary.autoModelSelectedDisplayMessage) {
             // Try to parse from display message like "50 requests remaining"
-            const match = summary.autoModelSelectedDisplayMessage.match(/(\d+)\s*requests?\s*remaining/i);
+            const match = summary.autoModelSelectedDisplayMessage.match(
+                /(\d+)\s*requests?\s*remaining/i
+            );
             if (match) {
                 // Assume 50 requests for hobby plan
                 const remaining = parseInt(match[1], 10);
@@ -442,19 +443,26 @@ export class CursorProvider implements Provider {
         const formatMembershipType = (type?: string): string => {
             if (!type) return 'Cursor';
             switch (type.toLowerCase()) {
-                case 'enterprise': return 'Enterprise';
-                case 'pro': return 'Pro';
-                case 'hobby': return 'Hobby (Free)';
-                case 'free': return 'Hobby (Free)';
-                case 'team': return 'Team';
-                default: return type.charAt(0).toUpperCase() + type.slice(1);
+                case 'enterprise':
+                    return 'Enterprise';
+                case 'pro':
+                    return 'Pro';
+                case 'hobby':
+                    return 'Hobby (Free)';
+                case 'free':
+                    return 'Hobby (Free)';
+                case 'team':
+                    return 'Team';
+                default:
+                    return type.charAt(0).toUpperCase() + type.slice(1);
             }
         };
 
         const primary: RateWindow = {
             usedPercent: planPercentUsed,
             resetsAt: billingCycleEnd,
-            resetDescription: summary.membershipType === 'hobby' ? 'Monthly Requests' : 'Plan Usage',
+            resetDescription:
+                summary.membershipType === 'hobby' ? 'Monthly Requests' : 'Plan Usage',
         };
 
         // On-demand usage as secondary (if applicable)
@@ -474,7 +482,7 @@ export class CursorProvider implements Provider {
             planPercentUsed,
             planUsedCents,
             planLimitCents,
-            membershipType: summary.membershipType
+            membershipType: summary.membershipType,
         });
 
         return {

@@ -82,7 +82,13 @@ export class FactoryProvider implements Provider {
             path.join(process.env.APPDATA || '', 'Factory', 'credentials.json'),
             path.join(process.env.APPDATA || '', 'Droid', 'credentials.json'),
             // macOS
-            path.join(os.homedir(), 'Library', 'Application Support', 'Factory', 'credentials.json'),
+            path.join(
+                os.homedir(),
+                'Library',
+                'Application Support',
+                'Factory',
+                'credentials.json'
+            ),
             path.join(os.homedir(), 'Library', 'Application Support', 'Droid', 'credentials.json'),
             // Linux
             path.join(os.homedir(), '.config', 'factory', 'credentials.json'),
@@ -111,7 +117,7 @@ export class FactoryProvider implements Provider {
                 'https://api.factory.dev/v1/usage',
                 {
                     headers: {
-                        'Authorization': `Bearer ${token}`,
+                        Authorization: `Bearer ${token}`,
                         'Content-Type': 'application/json',
                     },
                     timeout: this.timeout,
@@ -121,11 +127,15 @@ export class FactoryProvider implements Provider {
             const data = response.data;
             const usage = data.usage?.current;
 
-            const primary: RateWindow | undefined = usage ? {
-                usedPercent: usage.percent || (usage.limit ? (usage.used || 0) / usage.limit * 100 : 0),
-                resetsAt: usage.reset_at || data.usage?.billing?.period_end,
-                resetDescription: 'Usage',
-            } : undefined;
+            const primary: RateWindow | undefined = usage
+                ? {
+                      usedPercent:
+                          usage.percent ||
+                          (usage.limit ? ((usage.used || 0) / usage.limit) * 100 : 0),
+                      resetsAt: usage.reset_at || data.usage?.billing?.period_end,
+                      resetDescription: 'Usage',
+                  }
+                : undefined;
 
             return {
                 providerId: this.id,

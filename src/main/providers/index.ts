@@ -29,7 +29,7 @@ export interface ProviderUsage {
     accountPlan?: string;
     version?: string;
     error?: string;
-    needsLogin?: boolean;  // For providers that require browser login
+    needsLogin?: boolean; // For providers that require browser login
     updatedAt: string;
     // New fields for macOS parity
     credits?: {
@@ -82,7 +82,7 @@ export class ProviderManager {
     async refreshAll(): Promise<void> {
         const enabledProviders = this.settings.getEnabledProviders();
 
-        const promises = enabledProviders.map(async (providerId) => {
+        const promises = enabledProviders.map(async providerId => {
             const provider = this.providers.get(providerId);
             if (!provider) {
                 console.warn(`Provider not found: ${providerId}`);

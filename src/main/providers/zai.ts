@@ -106,33 +106,38 @@ export class ZaiProvider implements Provider {
 
     private async fetchUsage(token: string): Promise<ProviderUsage> {
         try {
-            const response = await axios.get<ZaiUsageResponse>(
-                'https://api.z.ai/v1/usage',
-                {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                        'Content-Type': 'application/json',
-                    },
-                    timeout: this.timeout,
-                }
-            );
+            const response = await axios.get<ZaiUsageResponse>('https://api.z.ai/v1/usage', {
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    'Content-Type': 'application/json',
+                },
+                timeout: this.timeout,
+            });
 
             const data = response.data;
             const quota = data.quota;
 
-            const primary: RateWindow | undefined = quota ? {
-                usedPercent: quota.percent_used || (quota.limit ? (quota.used || 0) / quota.limit * 100 : 0),
-                resetsAt: quota.reset_at,
-                resetDescription: 'Quota',
-            } : undefined;
+            const primary: RateWindow | undefined = quota
+                ? {
+                      usedPercent:
+                          quota.percent_used ||
+                          (quota.limit ? ((quota.used || 0) / quota.limit) * 100 : 0),
+                      resetsAt: quota.reset_at,
+                      resetDescription: 'Quota',
+                  }
+                : undefined;
 
             // MCP window as secondary if available
             const mcpWindow = data.mcp?.windows?.[0];
-            const secondary: RateWindow | undefined = mcpWindow ? {
-                usedPercent: mcpWindow.limit ? (mcpWindow.used || 0) / mcpWindow.limit * 100 : 0,
-                resetsAt: mcpWindow.reset_at,
-                resetDescription: mcpWindow.name || 'MCP',
-            } : undefined;
+            const secondary: RateWindow | undefined = mcpWindow
+                ? {
+                      usedPercent: mcpWindow.limit
+                          ? ((mcpWindow.used || 0) / mcpWindow.limit) * 100
+                          : 0,
+                      resetsAt: mcpWindow.reset_at,
+                      resetDescription: mcpWindow.name || 'MCP',
+                  }
+                : undefined;
 
             return {
                 providerId: this.id,

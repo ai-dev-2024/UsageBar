@@ -25,8 +25,8 @@ export class UsageHistory {
         this.store = new Store<UsageHistoryStore>({
             name: 'usage-history',
             defaults: {
-                history: []
-            }
+                history: [],
+            },
         });
 
         // Clean old entries on startup
@@ -43,7 +43,7 @@ export class UsageHistory {
             timestamp: Date.now(),
             providerId,
             sessionPercent,
-            weeklyPercent
+            weeklyPercent,
         });
 
         // Trim if too many entries
@@ -58,22 +58,25 @@ export class UsageHistory {
      * Get history for a specific provider
      */
     getProviderHistory(providerId: string, daysBack: number = 7): UsageDataPoint[] {
-        const cutoff = Date.now() - (daysBack * 24 * 60 * 60 * 1000);
+        const cutoff = Date.now() - daysBack * 24 * 60 * 60 * 1000;
         const history = this.store.get('history', []);
 
         return history.filter(
-            (point) => point.providerId === providerId && point.timestamp >= cutoff
+            point => point.providerId === providerId && point.timestamp >= cutoff
         );
     }
 
     /**
      * Get aggregated daily averages for a provider
      */
-    getDailyAverages(providerId: string, daysBack: number = 7): { date: string; avgSession: number; avgWeekly: number }[] {
+    getDailyAverages(
+        providerId: string,
+        daysBack: number = 7
+    ): { date: string; avgSession: number; avgWeekly: number }[] {
         const history = this.getProviderHistory(providerId, daysBack);
         const byDay: { [date: string]: { sessions: number[]; weeklys: number[] } } = {};
 
-        history.forEach((point) => {
+        history.forEach(point => {
             const date = new Date(point.timestamp).toISOString().split('T')[0];
             if (!byDay[date]) {
                 byDay[date] = { sessions: [], weeklys: [] };
@@ -84,22 +87,25 @@ export class UsageHistory {
             }
         });
 
-        return Object.entries(byDay).map(([date, data]) => ({
-            date,
-            avgSession: data.sessions.reduce((a, b) => a + b, 0) / data.sessions.length,
-            avgWeekly: data.weeklys.length > 0
-                ? data.weeklys.reduce((a, b) => a + b, 0) / data.weeklys.length
-                : 0
-        })).sort((a, b) => a.date.localeCompare(b.date));
+        return Object.entries(byDay)
+            .map(([date, data]) => ({
+                date,
+                avgSession: data.sessions.reduce((a, b) => a + b, 0) / data.sessions.length,
+                avgWeekly:
+                    data.weeklys.length > 0
+                        ? data.weeklys.reduce((a, b) => a + b, 0) / data.weeklys.length
+                        : 0,
+            }))
+            .sort((a, b) => a.date.localeCompare(b.date));
     }
 
     /**
      * Remove entries older than MAX_HISTORY_DAYS
      */
     private cleanup(): void {
-        const cutoff = Date.now() - (MAX_HISTORY_DAYS * 24 * 60 * 60 * 1000);
+        const cutoff = Date.now() - MAX_HISTORY_DAYS * 24 * 60 * 60 * 1000;
         const history = this.store.get('history', []);
-        const filtered = history.filter((point) => point.timestamp >= cutoff);
+        const filtered = history.filter(point => point.timestamp >= cutoff);
 
         if (filtered.length !== history.length) {
             this.store.set('history', filtered);

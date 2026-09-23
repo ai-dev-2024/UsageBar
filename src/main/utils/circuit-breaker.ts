@@ -1,7 +1,7 @@
 export enum CircuitState {
     CLOSED = 'CLOSED',
     OPEN = 'OPEN',
-    HALF_OPEN = 'HALF_OPEN'
+    HALF_OPEN = 'HALF_OPEN',
 }
 
 export interface CircuitBreakerOptions {
@@ -78,6 +78,9 @@ export class CircuitBreaker {
     }
 }
 
-export const createCircuitBreaker = (name: string, options?: CircuitBreakerOptions): CircuitBreaker => {
+export const createCircuitBreaker = (
+    name: string,
+    options?: CircuitBreakerOptions
+): CircuitBreaker => {
     return new CircuitBreaker(name, options);
 };

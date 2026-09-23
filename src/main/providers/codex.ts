@@ -99,7 +99,7 @@ export class CodexProvider implements Provider {
                 }
             }, this.timeout);
 
-            process.stdout.on('data', (data) => {
+            process.stdout.on('data', data => {
                 stdout += data.toString();
 
                 // Try to parse JSON-RPC response
@@ -121,7 +121,7 @@ export class CodexProvider implements Provider {
                 }
             });
 
-            process.stderr.on('data', (data) => {
+            process.stderr.on('data', data => {
                 stderr += data.toString();
             });
 
@@ -133,7 +133,7 @@ export class CodexProvider implements Provider {
                 }
             });
 
-            process.on('error', (err) => {
+            process.on('error', err => {
                 if (!resolved) {
                     resolved = true;
                     clearTimeout(timeout);
@@ -153,23 +153,27 @@ export class CodexProvider implements Provider {
     }
 
     private parseRPCResponse(response: CodexRPCResponse, version: string): ProviderUsage {
-        const primary: RateWindow | undefined = response.primary ? {
-            usedPercent: response.primary.usedPercent,
-            windowMinutes: response.primary.windowDurationMins,
-            resetsAt: response.primary.resetsAt
-                ? new Date(response.primary.resetsAt * 1000).toISOString()
-                : undefined,
-            resetDescription: 'Session',
-        } : undefined;
+        const primary: RateWindow | undefined = response.primary
+            ? {
+                  usedPercent: response.primary.usedPercent,
+                  windowMinutes: response.primary.windowDurationMins,
+                  resetsAt: response.primary.resetsAt
+                      ? new Date(response.primary.resetsAt * 1000).toISOString()
+                      : undefined,
+                  resetDescription: 'Session',
+              }
+            : undefined;
 
-        const secondary: RateWindow | undefined = response.secondary ? {
-            usedPercent: response.secondary.usedPercent,
-            windowMinutes: response.secondary.windowDurationMins,
-            resetsAt: response.secondary.resetsAt
-                ? new Date(response.secondary.resetsAt * 1000).toISOString()
-                : undefined,
-            resetDescription: 'Weekly',
-        } : undefined;
+        const secondary: RateWindow | undefined = response.secondary
+            ? {
+                  usedPercent: response.secondary.usedPercent,
+                  windowMinutes: response.secondary.windowDurationMins,
+                  resetsAt: response.secondary.resetsAt
+                      ? new Date(response.secondary.resetsAt * 1000).toISOString()
+                      : undefined,
+                  resetDescription: 'Weekly',
+              }
+            : undefined;
 
         return {
             providerId: this.id,
@@ -181,10 +185,12 @@ export class CodexProvider implements Provider {
             version,
             updatedAt: new Date().toISOString(),
             // macOS parity fields
-            credits: response.credits ? {
-                balance: response.credits.balance || '0',
-                unlimited: response.credits.unlimited,
-            } : undefined,
+            credits: response.credits
+                ? {
+                      balance: response.credits.balance || '0',
+                      unlimited: response.credits.unlimited,
+                  }
+                : undefined,
             dashboardUrl: 'https://platform.openai.com/usage',
             statusPageUrl: 'https://status.openai.com',
         };
@@ -202,15 +208,19 @@ export class CodexProvider implements Provider {
             const weeklyMatch = stdout.match(/weekly:\s*(\d+)%/i);
             const emailMatch = stdout.match(/email:\s*(\S+)/i);
 
-            const primary: RateWindow | undefined = sessionMatch ? {
-                usedPercent: parseInt(sessionMatch[1], 10),
-                resetDescription: 'Session',
-            } : undefined;
+            const primary: RateWindow | undefined = sessionMatch
+                ? {
+                      usedPercent: parseInt(sessionMatch[1], 10),
+                      resetDescription: 'Session',
+                  }
+                : undefined;
 
-            const secondary: RateWindow | undefined = weeklyMatch ? {
-                usedPercent: parseInt(weeklyMatch[1], 10),
-                resetDescription: 'Weekly',
-            } : undefined;
+            const secondary: RateWindow | undefined = weeklyMatch
+                ? {
+                      usedPercent: parseInt(weeklyMatch[1], 10),
+                      resetDescription: 'Weekly',
+                  }
+                : undefined;
 
             return {
                 providerId: this.id,

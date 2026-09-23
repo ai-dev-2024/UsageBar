@@ -132,7 +132,7 @@ export class CopilotProvider implements Provider {
      * Open a login window for GitHub OAuth Device Flow
      */
     async openLoginWindow(): Promise<boolean> {
-        return new Promise(async (resolve) => {
+        return new Promise(async resolve => {
             console.log('[Copilot] Starting GitHub Device Flow...');
 
             try {
@@ -145,13 +145,14 @@ export class CopilotProvider implements Provider {
                     }).toString(),
                     {
                         headers: {
-                            'Accept': 'application/json',
+                            Accept: 'application/json',
                             'Content-Type': 'application/x-www-form-urlencoded',
                         },
                     }
                 );
 
-                const { device_code, user_code, verification_uri, expires_in, interval } = deviceCodeResponse.data;
+                const { device_code, user_code, verification_uri, expires_in, interval } =
+                    deviceCodeResponse.data;
 
                 console.log('[Copilot] Device code obtained, user_code:', user_code);
 
@@ -228,11 +229,13 @@ export class CopilotProvider implements Provider {
                     </html>
                 `;
 
-                this.loginWindow.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
+                this.loginWindow.loadURL(
+                    `data:text/html;charset=utf-8,${encodeURIComponent(html)}`
+                );
 
                 // Poll for token
                 const pollInterval = (interval || 5) * 1000;
-                const maxAttempts = Math.floor((expires_in || 900) * 1000 / pollInterval);
+                const maxAttempts = Math.floor(((expires_in || 900) * 1000) / pollInterval);
                 let attempts = 0;
 
                 const poll = async () => {
@@ -259,7 +262,7 @@ export class CopilotProvider implements Provider {
                             }).toString(),
                             {
                                 headers: {
-                                    'Accept': 'application/json',
+                                    Accept: 'application/json',
                                     'Content-Type': 'application/x-www-form-urlencoded',
                                 },
                             }
@@ -303,7 +306,6 @@ export class CopilotProvider implements Provider {
                 this.loginWindow.on('closed', () => {
                     this.loginWindow = null;
                 });
-
             } catch (error) {
                 console.error('[Copilot] Device flow error:', error);
                 resolve(false);
@@ -359,15 +361,15 @@ export class CopilotProvider implements Provider {
                 'https://api.github.com/copilot_internal/user',
                 {
                     headers: {
-                        'Authorization': `token ${token}`,
-                        'Accept': 'application/json',
+                        Authorization: `token ${token}`,
+                        Accept: 'application/json',
                         'Editor-Version': 'vscode/1.96.2',
                         'Editor-Plugin-Version': 'copilot-chat/0.26.7',
                         'User-Agent': 'GitHubCopilotChat/0.26.7',
                         'X-Github-Api-Version': '2025-04-01',
                     },
                     timeout: this.timeout,
-                    validateStatus: (status) => status < 500,
+                    validateStatus: status => status < 500,
                 }
             );
 
@@ -456,7 +458,9 @@ export class CopilotProvider implements Provider {
             if (data.access_type_sku === 'free_limited_copilot') {
                 planName = 'Copilot Free';
             } else if (data.copilot_plan) {
-                planName = data.copilot_plan.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+                planName = data.copilot_plan
+                    .replace(/_/g, ' ')
+                    .replace(/\b\w/g, c => c.toUpperCase());
             }
 
             return {

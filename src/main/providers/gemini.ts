@@ -109,7 +109,7 @@ export class GeminiProvider implements Provider {
                 'https://generativelanguage.googleapis.com/v1/quota',
                 {
                     headers: {
-                        'Authorization': `Bearer ${accessToken}`,
+                        Authorization: `Bearer ${accessToken}`,
                         'Content-Type': 'application/json',
                     },
                     timeout: this.timeout,
@@ -122,21 +122,25 @@ export class GeminiProvider implements Provider {
             const requestsQuota = data.quotas?.find(q => q.metric?.includes('requests'));
             const tokensQuota = data.quotas?.find(q => q.metric?.includes('tokens'));
 
-            const primary: RateWindow | undefined = requestsQuota ? {
-                usedPercent: requestsQuota.limit
-                    ? (requestsQuota.usage || 0) / requestsQuota.limit * 100
-                    : 0,
-                resetsAt: requestsQuota.reset_time,
-                resetDescription: 'Requests',
-            } : undefined;
+            const primary: RateWindow | undefined = requestsQuota
+                ? {
+                      usedPercent: requestsQuota.limit
+                          ? ((requestsQuota.usage || 0) / requestsQuota.limit) * 100
+                          : 0,
+                      resetsAt: requestsQuota.reset_time,
+                      resetDescription: 'Requests',
+                  }
+                : undefined;
 
-            const secondary: RateWindow | undefined = tokensQuota ? {
-                usedPercent: tokensQuota.limit
-                    ? (tokensQuota.usage || 0) / tokensQuota.limit * 100
-                    : 0,
-                resetsAt: tokensQuota.reset_time,
-                resetDescription: 'Tokens',
-            } : undefined;
+            const secondary: RateWindow | undefined = tokensQuota
+                ? {
+                      usedPercent: tokensQuota.limit
+                          ? ((tokensQuota.usage || 0) / tokensQuota.limit) * 100
+                          : 0,
+                      resetsAt: tokensQuota.reset_time,
+                      resetDescription: 'Tokens',
+                  }
+                : undefined;
 
             return {
                 providerId: this.id,
@@ -161,13 +165,15 @@ export class GeminiProvider implements Provider {
 
             const data = JSON.parse(stdout);
 
-            const primary: RateWindow | undefined = data.requests ? {
-                usedPercent: data.requests.limit
-                    ? (data.requests.used || 0) / data.requests.limit * 100
-                    : 0,
-                resetsAt: data.requests.reset_at,
-                resetDescription: 'Requests',
-            } : undefined;
+            const primary: RateWindow | undefined = data.requests
+                ? {
+                      usedPercent: data.requests.limit
+                          ? ((data.requests.used || 0) / data.requests.limit) * 100
+                          : 0,
+                      resetsAt: data.requests.reset_at,
+                      resetDescription: 'Requests',
+                  }
+                : undefined;
 
             return {
                 providerId: this.id,

@@ -1,7 +1,7 @@
 /**
  * Claude Provider - Implementation based on CodexBar
  * Uses browser login flow to capture session cookies and fetch usage from console.anthropic.com
- * 
+ *
  * API Endpoints:
  * - https://console.anthropic.com/api/usage - Usage data (for Pro users)
  * - https://claude.ai/api/usage - Usage data (for Claude Max users)
@@ -100,7 +100,9 @@ export class ClaudeProvider implements Provider {
 
                 // Cookies exist but APIs didn't return usage data
                 // Don't clear session - user is logged in, just can't get usage data
-                console.log('[Claude] API calls failed - keeping session, showing logged in status');
+                console.log(
+                    '[Claude] API calls failed - keeping session, showing logged in status'
+                );
                 return {
                     providerId: this.id,
                     displayName: this.displayName,
@@ -178,17 +180,21 @@ export class ClaudeProvider implements Provider {
             const { stdout } = await execAsync('claude usage --json', { timeout: this.timeout });
             const data = JSON.parse(stdout);
 
-            const primary: RateWindow | undefined = data.session ? {
-                usedPercent: data.session.percent_used || 0,
-                resetsAt: data.session.reset_at,
-                resetDescription: 'Session',
-            } : undefined;
+            const primary: RateWindow | undefined = data.session
+                ? {
+                      usedPercent: data.session.percent_used || 0,
+                      resetsAt: data.session.reset_at,
+                      resetDescription: 'Session',
+                  }
+                : undefined;
 
-            const secondary: RateWindow | undefined = data.weekly ? {
-                usedPercent: data.weekly.percent_used || 0,
-                resetsAt: data.weekly.reset_at,
-                resetDescription: 'Weekly',
-            } : undefined;
+            const secondary: RateWindow | undefined = data.weekly
+                ? {
+                      usedPercent: data.weekly.percent_used || 0,
+                      resetsAt: data.weekly.reset_at,
+                      resetDescription: 'Weekly',
+                  }
+                : undefined;
 
             return {
                 providerId: this.id,
@@ -217,7 +223,7 @@ export class ClaudeProvider implements Provider {
      * Open a login window for the user to sign in to Claude
      */
     async openLoginWindow(): Promise<boolean> {
-        return new Promise((resolve) => {
+        return new Promise(resolve => {
             console.log('[Claude] Opening login window...');
 
             if (this.loginWindow && !this.loginWindow.isDestroyed()) {
@@ -247,15 +253,20 @@ export class ClaudeProvider implements Provider {
                     const allCookies = await loginSession.cookies.get({});
 
                     // Filter for relevant domains
-                    const relevantCookies = allCookies.filter(c =>
-                        c.domain?.includes('anthropic.com') ||
-                        c.domain?.includes('claude.ai')
+                    const relevantCookies = allCookies.filter(
+                        c => c.domain?.includes('anthropic.com') || c.domain?.includes('claude.ai')
                     );
 
-                    console.log('[Claude] Found cookies:', relevantCookies.length, 'relevant cookies');
+                    console.log(
+                        '[Claude] Found cookies:',
+                        relevantCookies.length,
+                        'relevant cookies'
+                    );
 
                     // Look for session cookie
-                    const sessionCookie = relevantCookies.find(c => SESSION_COOKIE_NAMES.includes(c.name));
+                    const sessionCookie = relevantCookies.find(c =>
+                        SESSION_COOKIE_NAMES.includes(c.name)
+                    );
 
                     if (sessionCookie) {
                         console.log('[Claude] Session cookie found:', sessionCookie.name);
@@ -298,10 +309,13 @@ export class ClaudeProvider implements Provider {
         });
     }
 
-    private async saveSessionCookies(cookies: Electron.Cookie[], source: 'console' | 'claude.ai'): Promise<void> {
+    private async saveSessionCookies(
+        cookies: Electron.Cookie[],
+        source: 'console' | 'claude.ai'
+    ): Promise<void> {
         try {
-            const relevantCookies = cookies.filter(c =>
-                c.domain?.includes('anthropic.com') || c.domain?.includes('claude.ai')
+            const relevantCookies = cookies.filter(
+                c => c.domain?.includes('anthropic.com') || c.domain?.includes('claude.ai')
             );
 
             const sessionData: StoredSession = {
@@ -379,12 +393,13 @@ export class ClaudeProvider implements Provider {
                 'https://console.anthropic.com/api/usage',
                 {
                     headers: {
-                        'Accept': 'application/json',
-                        'Cookie': cookieHeader,
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                        Accept: 'application/json',
+                        Cookie: cookieHeader,
+                        'User-Agent':
+                            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                     },
                     timeout: this.timeout,
-                    validateStatus: (status) => status < 500,
+                    validateStatus: status => status < 500,
                 }
             );
 
@@ -405,21 +420,21 @@ export class ClaudeProvider implements Provider {
     private async fetchFromClaudeAi(cookieHeader: string): Promise<ProviderUsage | null> {
         try {
             console.log('[Claude] Fetching from claude.ai/api/usage...');
-            const response = await axios.get<ClaudeUsageResponse>(
-                'https://claude.ai/api/usage',
-                {
-                    headers: {
-                        'Accept': 'application/json',
-                        'Cookie': cookieHeader,
-                        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
-                    },
-                    timeout: this.timeout,
-                    validateStatus: (status) => status < 500,
-                }
-            );
+            const response = await axios.get<ClaudeUsageResponse>('https://claude.ai/api/usage', {
+                headers: {
+                    Accept: 'application/json',
+                    Cookie: cookieHeader,
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                },
+                timeout: this.timeout,
+                validateStatus: status => status < 500,
+            });
 
             console.log('[Claude] claude.ai response status:', response.status);
-            console.log('[Claude] claude.ai response data:', JSON.stringify(response.data, null, 2));
+            console.log(
+                '[Claude] claude.ai response data:',
+                JSON.stringify(response.data, null, 2)
+            );
 
             if (response.status === 401 || response.status === 403) {
                 console.log('[Claude] Session expired or unauthorized');
@@ -469,11 +484,14 @@ export class ClaudeProvider implements Provider {
             resetDescription: 'Session',
         };
 
-        const secondary: RateWindow | undefined = weeklyPercent !== undefined ? {
-            usedPercent: weeklyPercent,
-            resetsAt: weeklyReset,
-            resetDescription: 'Weekly',
-        } : undefined;
+        const secondary: RateWindow | undefined =
+            weeklyPercent !== undefined
+                ? {
+                      usedPercent: weeklyPercent,
+                      resetsAt: weeklyReset,
+                      resetDescription: 'Weekly',
+                  }
+                : undefined;
 
         return {
             providerId: this.id,

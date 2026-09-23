@@ -6,16 +6,13 @@ export interface RetryOptions {
     retryOn?: number[];
 }
 
-export async function withRetry<T>(
-    fn: () => Promise<T>,
-    options: RetryOptions = {}
-): Promise<T> {
+export async function withRetry<T>(fn: () => Promise<T>, options: RetryOptions = {}): Promise<T> {
     const {
         maxAttempts = 3,
         baseDelay = 1000,
         maxDelay = 30000,
         backoffMultiplier = 2,
-        retryOn = [429, 500, 502, 503, 504]
+        retryOn = [429, 500, 502, 503, 504],
     } = options;
 
     let lastError: Error | undefined;

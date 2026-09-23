@@ -15,10 +15,13 @@ contextBridge.exposeInMainWorld('usagebar', {
     openSettings: () => ipcRenderer.send('open-settings'),
     quit: () => ipcRenderer.send('quit-app'),
     resizeWindow: (height: number) => ipcRenderer.send('resize-window', height),
-    onUsageUpdate: (callback: (usage: any) => void) => ipcRenderer.on('usage-update', (_, usage) => callback(usage)),
+    onUsageUpdate: (callback: (usage: any) => void) =>
+        ipcRenderer.on('usage-update', (_, usage) => callback(usage)),
     openUrl: (url: string) => ipcRenderer.send('open-url', url),
-    onEnabledProvidersUpdate: (callback: (providers: string[]) => void) => ipcRenderer.on('enabled-providers-update', (_, providers) => callback(providers)),
-    setSelectedProvider: (providerId: string) => ipcRenderer.send('set-selected-provider', providerId),
+    onEnabledProvidersUpdate: (callback: (providers: string[]) => void) =>
+        ipcRenderer.on('enabled-providers-update', (_, providers) => callback(providers)),
+    setSelectedProvider: (providerId: string) =>
+        ipcRenderer.send('set-selected-provider', providerId),
 
     // Provider login flows
     cursorLogin: () => ipcRenderer.invoke('cursor-login'),
@@ -31,15 +34,21 @@ contextBridge.exposeInMainWorld('usagebar', {
     providerLogin: (providerId: string) => ipcRenderer.invoke('provider-login', providerId),
 
     // Notifications
-    showNotification: (title: string, body: string) => ipcRenderer.send('show-notification', title, body),
+    showNotification: (title: string, body: string) =>
+        ipcRenderer.send('show-notification', title, body),
 
     // Update notifications and actions
-    onUpdateAvailable: (callback: (version: string) => void) => ipcRenderer.on('update-available', (_, version) => callback(version)),
-    onUpdateDownloadProgress: (callback: (percent: number) => void) => ipcRenderer.on('update-download-progress', (_, percent) => callback(percent)),
-    onUpdateDownloaded: (callback: (version: string) => void) => ipcRenderer.on('update-downloaded', (_, version) => callback(version)),
-    onUpdateError: (callback: (error: string) => void) => ipcRenderer.on('update-error', (_, error) => callback(error)),
+    onUpdateAvailable: (callback: (version: string) => void) =>
+        ipcRenderer.on('update-available', (_, version) => callback(version)),
+    onUpdateDownloadProgress: (callback: (percent: number) => void) =>
+        ipcRenderer.on('update-download-progress', (_, percent) => callback(percent)),
+    onUpdateDownloaded: (callback: (version: string) => void) =>
+        ipcRenderer.on('update-downloaded', (_, version) => callback(version)),
+    onUpdateError: (callback: (error: string) => void) =>
+        ipcRenderer.on('update-error', (_, error) => callback(error)),
     downloadUpdate: () => ipcRenderer.send('download-update'),
     installUpdate: () => ipcRenderer.send('install-update'),
     resetAllUsage: () => ipcRenderer.send('reset-all-usage'),
-    onSettingsUpdate: (callback: (settings: any) => void) => ipcRenderer.on('settings-update', (_, settings) => callback(settings)),
+    onSettingsUpdate: (callback: (settings: any) => void) =>
+        ipcRenderer.on('settings-update', (_, settings) => callback(settings)),
 });

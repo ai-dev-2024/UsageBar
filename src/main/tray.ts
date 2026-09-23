@@ -18,23 +18,33 @@ export function createTrayIcon(usedPercent: number): NativeImage {
     const fillHeight = Math.floor((remaining / 100) * (ICON_SIZE - 4));
 
     // Background color (dark gray)
-    const bgR = 40, bgG = 40, bgB = 40;
+    const bgR = 40,
+        bgG = 40,
+        bgB = 40;
 
     // Fill color based on remaining percentage - teal for macOS parity
     let fillR: number, fillG: number, fillB: number;
     if (remaining > 50) {
         // Teal (#14B8A6)
-        fillR = 20; fillG = 184; fillB = 166;
+        fillR = 20;
+        fillG = 184;
+        fillB = 166;
     } else if (remaining > 20) {
         // Yellow/Orange
-        fillR = 255; fillG = 193; fillB = 7;
+        fillR = 255;
+        fillG = 193;
+        fillB = 7;
     } else {
         // Red
-        fillR = 244; fillG = 67; fillB = 54;
+        fillR = 244;
+        fillG = 67;
+        fillB = 54;
     }
 
     // Border color
-    const borderR = 100, borderG = 100, borderB = 100;
+    const borderR = 100,
+        borderG = 100,
+        borderB = 100;
 
     for (let y = 0; y < ICON_SIZE; y++) {
         for (let x = 0; x < ICON_SIZE; x++) {
@@ -45,7 +55,8 @@ export function createTrayIcon(usedPercent: number): NativeImage {
 
             // Check if in fill area (from bottom)
             const fillStartY = ICON_SIZE - 2 - fillHeight;
-            const isInFill = !isBorder && x > 1 && x < ICON_SIZE - 2 && y > fillStartY && y < ICON_SIZE - 1;
+            const isInFill =
+                !isBorder && x > 1 && x < ICON_SIZE - 2 && y > fillStartY && y < ICON_SIZE - 1;
 
             if (isBorder) {
                 canvas[i] = borderR;
@@ -90,17 +101,21 @@ export function createDualBarTrayIcon(sessionPercent: number, weeklyPercent: num
 
     // Colors based on remaining percentage
     const getColor = (remaining: number) => {
-        if (remaining > 50) return { r: 20, g: 184, b: 166 };  // Teal
-        if (remaining > 20) return { r: 255, g: 193, b: 7 };   // Yellow
-        return { r: 244, g: 67, b: 54 };                        // Red
+        if (remaining > 50) return { r: 20, g: 184, b: 166 }; // Teal
+        if (remaining > 20) return { r: 255, g: 193, b: 7 }; // Yellow
+        return { r: 244, g: 67, b: 54 }; // Red
     };
 
     const sessionColor = getColor(sessionRemaining);
     const weeklyColor = getColor(weeklyRemaining);
 
     // Background and border
-    const bgR = 40, bgG = 40, bgB = 40;
-    const borderR = 80, borderG = 80, borderB = 80;
+    const bgR = 40,
+        bgG = 40,
+        bgB = 40;
+    const borderR = 80,
+        borderG = 80,
+        borderB = 80;
 
     // Top bar: y = 2-6 (session, thicker)
     // Bottom bar: y = 9-12 (weekly, thinner)

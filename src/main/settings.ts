@@ -52,7 +52,8 @@ export class SettingsStore {
             hotkey: this.store.get('hotkey', defaultSettings.hotkey),
             popupOpacity: this.store.get('popupOpacity', defaultSettings.popupOpacity),
             windowBounds: this.store.get('windowBounds') || defaultSettings.windowBounds!,
-            settingsWindowBounds: this.store.get('settingsWindowBounds') || defaultSettings.settingsWindowBounds!,
+            settingsWindowBounds:
+                this.store.get('settingsWindowBounds') || defaultSettings.settingsWindowBounds!,
         };
     }
 
@@ -131,4 +132,3 @@ export class SettingsStore {
         this.store.set('settingsWindowBounds', bounds);
     }
 }
-
